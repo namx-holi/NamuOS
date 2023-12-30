@@ -5,7 +5,6 @@ We need some basics for building with GCC and an assembler, as well as something
 ```sh
 sudo apt install build-essential
 sudo apt install git bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev
-sudo apt install make nasm # x86 assembler
 sudo apt install grub-common xorriso grub-pc-bin # ISOs and GRUB
 ```
 
@@ -55,6 +54,12 @@ make all-target-libgcc
 make install-gcc
 make install-target-libgcc
 ```
+
+## Building
+Just run `make` to build the project. This will create an .iso `namuos.iso`.
+
+## Running
+You can run the OS with qemu using `make qemu`
 
 
 ## Resources

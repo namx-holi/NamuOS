@@ -1,0 +1,9 @@
+# Build-related
+build
+*.iso
+
+# IDE related
+.vscode
+
+# Old code
+old
