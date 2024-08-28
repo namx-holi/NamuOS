@@ -1,3 +1,5 @@
+/// @file tty.c
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -40,7 +42,19 @@ void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
 
 void terminal_putchar(char c) {
 	unsigned char uc = c;
-	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+
+	// If character is \n, step to next line
+	if (uc == '\n') {
+		terminal_row++;
+		terminal_column = -1; // Will be incremented on bounds check
+	}
+	
+	// If regular character, place it!
+	else {
+		terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+	}
+
+	// Bounds check the terminal screen
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
 		if (++terminal_row == VGA_HEIGHT)
