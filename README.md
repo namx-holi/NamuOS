@@ -1,6 +1,7 @@
 # NamuOS
 
-## Requirements
+## Building & Running
+### Requirements
 We need some basics for building with GCC and an assembler, as well as something to create images to run.
 ```sh
 sudo apt install build-essential
@@ -18,6 +19,12 @@ Some info on these packages:
 - (flex)[https://www.gnu.org/software/flex/]
 - (texinfo)[https://www.gnu.org/software/texinfo/]
 - (qemu)[https://www.qemu.org/]
+
+If documentation is to be generated,
+```sh
+sudo apt install doxygen
+sudo apt install graphviz
+```
 
 
 ### C Cross Compiler
@@ -55,14 +62,48 @@ make install-gcc
 make install-target-libgcc
 ```
 
-## Building
+### Building with Make
 Just run `make` to build the project. This will create an .iso `namuos.iso`.
 
-## Running
+### Running
 You can run the OS with qemu using `make qemu`
+
+## Implementation Details
+### C Standard Library
+
+
+```
+#include <limits.h>
+#include <stdbool.h>
+#include <stdarg.h>
+```
+
+
 
 
 ## Resources
 - [Medium - Writing a basic kernel](https://computers-art.medium.com/writing-a-basic-kernel-6479a495b713)
 - [OSDev - Bare Bones with NASM](https://wiki.osdev.org/Bare_Bones_with_NASM)
 - [OSDev - Bare Bones: Booting the Operating System](https://wiki.osdev.org/Bare_Bones#Booting_the_Operating_System)
+
+## TODO
+- C Standard Library
+	- assert.h
+	- complex.h
+	- ctype.h
+	- errno.h
+	- fenv.h
+	- inttypes.h
+	- locale.h
+	- math.h
+	- setjmp.h
+	- signal.h
+	- stdio.h
+	- stdlib.h
+	- string.h
+	- tgmath.h
+	- threads.h
+	- time.h
+	- uchar.h
+	- wchar.h
+	- wctype.h

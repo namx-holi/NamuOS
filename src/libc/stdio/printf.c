@@ -1,9 +1,19 @@
+/// @file printf.c
+
 #include <limits.h>
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
+// TODO: Handle:
+//  - \a (alert), make sound
+//  - \b (backspace), move back one position on current line
+//  - \f (form feed), move to start of next page
+//  - \n (new line), move to start of next line
+//  - \r (carriage return), move to start of current line
+//  - \t (horizontal tab), move to next tabulation position
+//  - \v (vertical tab), move to next vertical tabulation position
 static bool print(const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
 	for (size_t i = 0; i < length; i++)

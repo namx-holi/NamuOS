@@ -48,3 +48,7 @@ qemu:
 
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -rf doxygen
+
+doxygen:
+	doxygen Doxyfile

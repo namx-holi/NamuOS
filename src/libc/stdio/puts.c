@@ -1,3 +1,5 @@
+/// @file puts.c
+
 #include <stdio.h>
 
 int puts(const char* string) {
