@@ -1,5 +1,9 @@
 /// @file stdio.h
 
+/** \addtogroup stdio stdio.h
+ * @{
+ */
+
 #ifndef _STDIO_H
 #define _STDIO_H 1
 
@@ -73,29 +77,34 @@ typedef struct __fpos_t {
 // #define stderr stderr
 
 
-
-/* Operations on files */
-
+/** \addtogroup stdio_operations_on_files Operations on files
+ * @brief Remove/rename files, and temporary files
+ * @{
+ */
 int   remove(const char* filename); // Remove file
 int   rename(const char* oldname, const char* newname); // Rename file
 FILE* tmpfile(void); // Open a temporary file
 char* tmpnam(char* str); // Generate temporary filename // TODO: char[L_tmpnam] instead of char*
+/** @} */
 
 
-
-/* File access */
-
+/** \addtogroup stdio_file_access File access
+ * @brief Open, flose, flush, and stream buffers
+ * @{
+ */
 int   fclose(FILE* stream); // Close file
 int   fflush(FILE* stream); // Flush stream
 FILE* fopen(const char* __restrict filename, const char* __restrict mode); // Open file
 FILE* freopen(const char* __restrict filename, const char* __restrict mode, FILE* __restrict stream); // Reopen stream with different file or mode
 void  setbuf(FILE* __restrict stream, char* __restrict buffer); // Set stream buffer
 int   setvbuf(FILE* __restrict stream, char* __restrict buffer, int mode, size_t size); // Change stream buffering
+/** @} */
 
 
-
-/* Formatted input/output */
-
+/** \addtogroup stdio_formatted_io Formatted input/output
+ * @brief Printing and scanning
+ * @{
+ */
 int fprintf(FILE* __restrict stream, const char* __restrict format, ...); // Write formatted data to stream
 int fscanf(FILE* __restrict stream, const char* __restrict format, ...); // Read formatted data from stream
 int printf(const char* __restrict format, ...); // Print formatted data to stdout
@@ -110,11 +119,13 @@ int vscanf(const char* __restrict format, va_list arg); // Read formatted data i
 int vsnprintf(char* __restrict s, size_t n, const char* __restrict format, va_list arg); // Write formatted data from variable argument list to sized buffer
 int vsprintf(char* __restrict s, const char* __restrict format, va_list arg); // Write formatted data from variable argument list to string
 int vsscanf(const char* __restrict s, const char* __restrict format, va_list arg); // Read formatted data from string into variable argument list
+/** @} */
 
 
-
-/* Character input/output */
-
+/** \addtogroup stdio_character_io Character input/output
+ * @brief Get and put
+ * @{
+ */
 int   fgetc(FILE* stream); // Get character from stream
 char* fgets(char* __restrict str, int num, FILE* __restrict stream); // Get string from stream
 int   fputc(int character, FILE* stream); // Write character to stream
@@ -126,36 +137,44 @@ int   putc(int character, FILE* stream); // Write character to stream
 int   putchar(int character); // Write character to stdout
 int   puts(const char* str); // Write string to stdout
 int   ungetc(int character, FILE* stream); // Unget character from stream
+/** @} */
 
 
-
-/* Direct input/output */
-
+/** \addtogroup stdio_direct_io Direct input/output
+ * @brief Read and write
+ * @{
+ */
 size_t fread(void* __restrict ptr, size_t size, size_t count, FILE* __restrict stream); // Read block of data from stream
 size_t fwrite(const void* __restrict ptr, size_t size, size_t count, FILE* __restrict stream); // Write block of data to stream
+/** @} */
 
 
-
-/* File positioning */
-
+/** \addtogroup stdio_file_positioning File positioning
+ * @brief Seek and tell
+ * @{
+ */
 int      fgetpos(FILE* __restrict stream, fpos_t* __restrict pos); // Get current position in stream
 int      fseek(FILE* stream, long int offset, int origin); // Reposition stream position indicator
 int      fsetpos(FILE* stream, const fpos_t* pos); // Set position indicator of stream // TODO: restrict?
 long int ftell(FILE* stream); // Get current position in stream
 void     rewind(FILE* stream); // Set position of stream to the beginning
+/** @} */
 
 
-
-/* Error-handling */
-
+/** \addtogroup stdio_error_handling Error-handling
+ * @brief Print, check, and clear errors
+ * @{
+ */
 void clearerr(FILE* stream); // Clear error indicators
 int  feof(FILE* stream); // Check end-of-file indicator
 int  ferror(FILE* stream); // Check error indicator
 void perror(const char* str); // Print error message
-
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
+/** @} */

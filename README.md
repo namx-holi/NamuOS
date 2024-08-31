@@ -22,8 +22,7 @@ Some info on these packages:
 
 If documentation is to be generated,
 ```sh
-sudo apt install doxygen
-sudo apt install graphviz
+sudo apt install doxygen graphviz
 ```
 
 

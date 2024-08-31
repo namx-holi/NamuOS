@@ -14,7 +14,7 @@ SYSROOT=$(BUILD_DIR)/sysroot
 ISO_OBJ=namuos.iso
 
 
-.phony: all build_iso install_headers build_project qemu clean
+.phony: all build_iso install_headers build_project qemu clean docs
 
 
 all: build_iso
@@ -50,5 +50,5 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf doxygen
 
-doxygen:
+docs:
 	doxygen Doxyfile
