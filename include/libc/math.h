@@ -1,4 +1,10 @@
-/// @file math.h
+/**
+ * @file math.h
+ * @defgroup clib_math <math.h>
+ * @brief todo
+ * @ingroup clib
+ * @{
+*/
 
 #ifndef _STDLIB_H
 #define _STDLIB_H 1
@@ -88,3 +94,5 @@ extern int signgam; // TODO: Implement math/signgam
 #endif
 
 #endif
+
+/** @} */

@@ -67,18 +67,6 @@ Just run `make` to build the project. This will create an .iso `namuos.iso`.
 ### Running
 You can run the OS with qemu using `make qemu`
 
-## Implementation Details
-### C Standard Library
-
-
-```
-#include <limits.h>
-#include <stdbool.h>
-#include <stdarg.h>
-```
-
-
-
 
 ## Resources
 - [Medium - Writing a basic kernel](https://computers-art.medium.com/writing-a-basic-kernel-6479a495b713)
@@ -86,23 +74,34 @@ You can run the OS with qemu using `make qemu`
 - [OSDev - Bare Bones: Booting the Operating System](https://wiki.osdev.org/Bare_Bones#Booting_the_Operating_System)
 
 ## TODO
-- C Standard Library
-	- assert.h
+- Implement C standard library
 	- complex.h
+		- Finish declarations
+		- Implementations (or disable)
 	- ctype.h
+		- Handle locale?
 	- errno.h
 	- fenv.h
 	- inttypes.h
 	- locale.h
+		- Implementations
 	- math.h
+		- Rewrite and document
+		- Implementations
 	- setjmp.h
 	- signal.h
+	- stdbit.h
 	- stdio.h
+		- Completely redocument
+		- Implementations
 	- stdlib.h
+		- Completely redocument
+		- Implementations
 	- string.h
-	- tgmath.h
+		- Rewrite and document
 	- threads.h
 	- time.h
 	- uchar.h
 	- wchar.h
 	- wctype.h
+- Implement a way to launch OS in debug mode within VS Code

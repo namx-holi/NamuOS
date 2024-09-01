@@ -14,7 +14,7 @@ SYSROOT=$(BUILD_ROOT)/sysroot
 LIBK_OBJ=$(BUILD_ROOT)/libk.a
 
 
-LIBC_SRC=$(wildcard **/*.c)
+LIBC_SRC=$(wildcard *.c) $(wildcard **/*.c)
 LIBC_OBJ=$(patsubst %.c, $(BUILD_DIR)/%.libk.o, $(LIBC_SRC))
 LIBC_SRC_DIRS=$(wildcard **/)
 LIBC_OBJ_DIRS=$(patsubst %, $(BUILD_DIR)/%, $(LIBC_SRC_DIRS))
