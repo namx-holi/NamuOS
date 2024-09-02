@@ -1,9 +1,9 @@
 /// @file putchar.c
 
-#include <stdio.h>
+#include <stdio.h> // Implements
 
 #if defined(__is_libk)
-#include <kernel/tty.h>
+#include <kernel/tty.h> // terminal_write
 #endif
 
 int putchar(int ic) {

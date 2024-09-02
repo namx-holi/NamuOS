@@ -1,7 +1,8 @@
 /// @file abort.c
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> // Implements
+
+#include <stdio.h> // printf
 
 __attribute__((__noreturn__))
 void abort(void) {

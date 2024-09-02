@@ -1,10 +1,15 @@
 /// @file printf.c
 
-#include <limits.h>
-#include <stdbool.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdio.h> // Implements
+
+#include <stdbool.h> // true, false
+#include <stddef.h> // size_t
+#include <stdarg.h> // va_list
+#include <string.h> // strlen
+#include <limits.h> // INT_MAX
+
+// TODO: Rewrite
+
 
 // TODO: Handle:
 //  - \a (alert), make sound
