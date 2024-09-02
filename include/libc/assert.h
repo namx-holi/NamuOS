@@ -10,10 +10,17 @@
  * @note Since C23, `static_assert` is itself a keyword, which may also be a
  * predefined macro, so @ref libc_assert no longer provides it.
  * 
+ * @see @ref math_errhandling @copybrief math_errhandling
+ * @see @ref MATH_ERRNO @copybrief MATH_ERRNO
+ * @see @ref MATH_ERREXCEPT @copybrief MATH_ERREXCEPT
+ * 
+ * @see [C documentation](https://en.cppreference.com/w/c/error)
+ * for **Error handling**
+ * @see [C++ documentation](https://en.cppreference.com/w/cpp/error)
+ * for **Error handling**
+ * 
  * @{
 */
-
-// Ref: https://en.cppreference.com/w/c/header
 
 #ifndef _LIBC_ASSERT_H
 #define _LIBC_ASSERT_H 1
@@ -21,7 +28,6 @@
 #ifdef NDEBUG
 #define assert(condition) ((void)0)
 #else
-
 /** @brief Reports a failed assertion
  * 
  * Reports a failed assertion
@@ -32,7 +38,6 @@
  * @param line What line of the file this assertion was on
 */
 extern void _assert(const char* condition, const char* file, const char* func, int line);
-
 
 /** @brief Aborts the program if the user-specified condition is not true.
  * 
@@ -79,7 +84,6 @@ extern void _assert(const char* condition, const char* file, const char* func, i
 		_assert(#condition, __FILE__, __func__, __LINE__); \
 	}                                                      \
 }
-
 #endif /* NDEBUG */
 
 #endif

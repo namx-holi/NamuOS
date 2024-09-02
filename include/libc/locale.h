@@ -6,13 +6,13 @@
  * 
  * @todo Detailed description
  * 
+ * @see [C documentation](https://en.cppreference.com/w/c/locale)
+ * for **Localisation library**
  * @see [C++ documentation](https://en.cppreference.com/w/cpp/locale)
- * for Localisation library
+ * for **Localisation library**
  * 
  * @{
 */
-
-// Ref: https://en.cppreference.com/w/c/locale
 
 #ifndef _LIBC_LOCALE_H
 #define _LIBC_LOCALE_H
@@ -89,7 +89,6 @@ struct lconv {
 	char int_p_sign_posn; ///< Indicates the position of `positive_sign` in a non-negative international monetary value
 	char int_n_sign_posn; ///< Indicates the position of `negative_sign` in a negative international monetary value
 };
-
 
 /** @brief Gets and sets the current C locale
  * 

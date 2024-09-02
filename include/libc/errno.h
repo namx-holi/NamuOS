@@ -1,23 +1,25 @@
 /**
  * @file errno.h
  * @defgroup libc_errno <errno.h>
- * @brief TODO
+ * @brief Macros reporting error conditions
  * @ingroup libc
  * 
  * @todo Detailed description
+ * @todo See X documentation
  * 
  * @see @ref math_errhandling @copybrief math_errhandling
  * @see @ref MATH_ERRNO @copybrief MATH_ERRNO
  * @see @ref MATH_ERREXCEPT @copybrief MATH_ERREXCEPT
+ * 
+ * @see [C documentation](https://en.cppreference.com/w/c/error)
+ * for **Error handling**
  * @see [C++ documentation](https://en.cppreference.com/w/cpp/error)
  * for **Error handling**
  * 
- * @todo Implementation for Bounds checking?
+ * @todo Implementation for bounds checking?
  * 
  * @{
 */
-
-// Ref: https://en.cppreference.com/w/c/error
 
 #ifndef _LIBC_ERRNO_H
 #define _LIBC_ERRNO_H 1

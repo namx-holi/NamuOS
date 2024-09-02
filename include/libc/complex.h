@@ -49,13 +49,13 @@
  * incompatible with standard C complex types and do not support the `+`, `-`,
  * `*`, `/` operators.
  * 
+ * @see [C documentation](https://en.cppreference.com/w/c/numeric/complex)
+ * for **Complex number arithmetic**
  * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex)
- * for Complex number arithmetic
+ * for **Complex number arithmetic**
  * 
  * @{
 */
-
-// Ref: https://en.cppreference.com/w/c/numeric/complex
 
 #ifndef _LIBC_COMPLEX_H
 #define _LIBC_COMPLEX_H 1
