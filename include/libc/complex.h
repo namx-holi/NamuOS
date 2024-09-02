@@ -1,8 +1,8 @@
 /**
  * @file complex.h
- * @defgroup clib_complex <complex.h>
+ * @defgroup libc_complex <complex.h>
  * @brief Complex number arithmetic
- * @ingroup clib
+ * @ingroup libc
  * 
  * If the macro constant `__STDC_NO_COMPLEX__` is defined by the
  * implementation, the complex types, the header @ref clib_complex and all the
@@ -57,8 +57,8 @@
 
 // Ref: https://en.cppreference.com/w/c/numeric/complex
 
-#ifndef _CLIB_COMPLEX_H
-#define _CLIB_COMPLEX_H 1
+#ifndef _LIBC_COMPLEX_H
+#define _LIBC_COMPLEX_H 1
 
 /** @brief Imaginary type macro
  * 

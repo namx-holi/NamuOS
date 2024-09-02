@@ -1,8 +1,8 @@
 /**
  * @file locale.h
- * @defgroup clib_locale <locale.h>
+ * @defgroup libc_locale <locale.h>
  * @brief Localisation utilities
- * @ingroup clib
+ * @ingroup libc
  * 
  * @todo Detailed description
  * 
@@ -14,8 +14,8 @@
 
 // Ref: https://en.cppreference.com/w/c/locale
 
-#ifndef _CLIB_LOCALE_H
-#define _CLIB_LOCALE_H
+#ifndef _LIBC_LOCALE_H
+#define _LIBC_LOCALE_H
 
 /** @brief Formatting details, returned by @ref localeconv
  * 

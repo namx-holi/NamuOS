@@ -1,8 +1,11 @@
 /**
  * @file math.h
- * @defgroup clib_math <math.h>
+ * @defgroup libc_math <math.h>
  * @brief todo
- * @ingroup clib
+ * @ingroup libc
+ * 
+ * @todo Rewrite with complete documentation
+ * 
  * @{
 */
 

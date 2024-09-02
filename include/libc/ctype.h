@@ -1,8 +1,8 @@
 /**
  * @file ctype.h
- * @defgroup clib_ctype <ctype.h>
+ * @defgroup libc_ctype <ctype.h>
  * @brief Functions to determine the type contained in character data
- * @ingroup clib
+ * @ingroup libc
  * 
  * @todo Detailed description
  * 
@@ -14,8 +14,8 @@
 
 // Ref: https://en.cppreference.com/w/c/string/byte
 
-#ifndef _CLIB_CTYPE_H
-#define _CLIB_CTYPE_H 1
+#ifndef _LIBC_CTYPE_H
+#define _LIBC_CTYPE_H 1
 
 /** @brief Checks if a character is alphanumeric
  * 

@@ -1,3 +1,3 @@
 /**
- * @defgroup clib C Standard Library
+ * @defgroup libc C Standard Library
 */

@@ -1,19 +1,22 @@
 /** 
  * @file assert.h
- * @defgroup clib_assert <assert.h>
+ * @defgroup libc_assert <assert.h>
  * @brief Conditionally compiled macro that compares its argument to zero
- * @ingroup clib
+ * @ingroup libc
  * 
  * `assert.h` defines one macro function that can be used as a standard
  * debugging tool.
  * 
+ * @note Since C23, `static_assert` is itself a keyword, which may also be a
+ * predefined macro, so @ref libc_assert no longer provides it.
+ * 
  * @{
 */
 
-// Ref: https://cplusplus.com/reference/cassert/
+// Ref: https://en.cppreference.com/w/c/header
 
-#ifndef _CLIB_ASSERT_H
-#define _CLIB_ASSERT_H 1
+#ifndef _LIBC_ASSERT_H
+#define _LIBC_ASSERT_H 1
 
 #ifdef NDEBUG
 #define assert(condition) ((void)0)
