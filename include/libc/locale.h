@@ -132,12 +132,7 @@ struct lconv {
  * of the pointed-to string, may be invalidated by subsequent calls to
  * `setlocale`.
  * 
- * @see @ref LC_ALL locale category for `setlocale`
- * @see @ref LC_COLLATE locale category for `setlocale`
- * @see @ref LC_CTYPE locale category for `setlocale`
- * @see @ref LC_MONETARY locale category for `setlocale`
- * @see @ref LC_NUMERIC locale category for `setlocale`
- * @see @ref LC_TIME locale category for `setlocale`
+ * @see @ref libc_locale_categories @copybrief libc_locale_categories
  * @see [C++ documentation](https://en.cppreference.com/w/cpp/locale/setlocale) for `setlocale`
 */
 extern char* setlocale(int category, const char* locale);
@@ -161,7 +156,41 @@ extern char* setlocale(int category, const char* locale);
 */
 struct lconv* localeconv(void);
 
-
+/**
+ * @defgroup libc_locale_categories LC_ALL, LC_COLLATE, ..., LC_TIME 
+ * @brief Locale categories for @ref setlocale
+ * @ingroup libc_locale
+ * 
+ * Each of these macro constants expand to integer constant expressions with
+ * distinct values that are suitable for use as the first argument of
+ * @ref setlocale.
+ * 
+ * Additional macro constants, with names that begin with `LC_` followed by at
+ * least one uppercase letter, may be defined in @ref libc_locale. For example,
+ * the POSIX specification requires `LC_MESSAGES` (which controls, among other
+ * things, @ref perror and @ref stderror), ISO/IEC 30112:2014
+ * ([2014 draft](https://www.open-std.org/JTC1/SC35/WG5/docs/30112d10.pdf))
+ * additionally defines `LC_IDENTIFICATION`, `LC_XLITERATE`, `LC_NAME`,
+ * `LC_ADDRESS`, `LC_TELEPHONE`, `LC_PAPER`, `LC_MEASUREMENT`, and
+ * `LC_KEYBOARD`, which are supported by the GNU C library (except for
+ * `LC_XLITERATE`).
+ * 
+ * @see @ref setlocale @copybrief setlocale
+ * @see [C++ documentation](https://en.cppreference.com/w/cpp/locale/LC_categories)
+ * for **locale categories**
+ * 
+ * @todo Implementations for categories. Could be just digits
+ * 
+ * @{
+ */
+// TODO: Implement locale categories
+#define LC_ALL 1 ///< Selects the entire C locale
+#define LC_COLLATE 2 ///< Selects the collation category of the C locale
+#define LC_CTYPE 3 ///< Selects the character classification category of the C locale
+#define LC_MONETARY 4 ///< Selects the monetary formatting category of the C locale
+#define LC_NUMERIC 5 ///< Selects the numeric formatting category of the C locale
+#define LC_TIME 6 ///< Selects the time formatting category of the C locale
+/** @} */
 
 #endif
 
