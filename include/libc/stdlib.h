@@ -97,6 +97,7 @@ extern void abort(void) __attribute__((__noreturn__));
 // TODO: strtoimax
 // TODO: strtoumax
 
+
 // Ref: https://en.cppreference.com/w/cpp/string/multibyte
 // TODO: mblen
 // TODO: mbtowc
@@ -105,28 +106,94 @@ extern void abort(void) __attribute__((__noreturn__));
 // TODO: wcstombs, wcstombs_s
 // TODO: MB_CUR_MAX
 
+
 // Ref: https://en.cppreference.com/w/c/string/wide
 // TODO: wchar_t (in stdlib.h, wchar.h)
+
 
 // Ref: https://en.cppreference.com/w/c/numeric/random
 // TODO: rand
 // TODO: srand
 // TODO: RAND_MAX
 
+
 // Ref: https://en.cppreference.com/w/c/algorithm
 // TODO: qsort, qsort_s
 // TODO: bsearch, bsearch_s
 
-// Ref: https://en.cppreference.com/w/c/numeric/math
-// TODO: abs
-// TODO: labs
-// TODO: llabs
-// TODO: div
-// TODO: ldiv
-// TODO: lldiv
-// TODO: div_t
-// TODO: ldiv_t
-// TODO: lldiv_t
+
+/** @brief Structure returned by @ref div */
+typedef struct {
+    int quot; ///< Quotient
+    int rem;  ///< Remainder
+} div_t;
+
+/** @brief Structure returned by @ref ldiv */
+typedef struct {
+    long quot; ///< Quotient
+    long rem;  ///< Remainder
+} ldiv_t;
+
+/** @brief Structure returned by @ref lldiv */
+typedef struct {
+    long long quot; ///< Quotient
+    long long rem;  ///< Remainder
+} lldiv_t;
+
+/** @brief Computes absolute value of an integral value (\f$|n|\f$)
+ * 
+ * Computes the absolute value of an integer number. The behaviour is undefined
+ * if the result cannot bre represented by the return type.
+ * 
+ * @param n Integer value
+ * 
+ * @returns The absolute value of `n` (i.e. \f$|n|\f$), if it is representable.
+ * 
+ * @note In 2's complement systems, the absolute value of the most-negative
+ * value is out of range, e.e. for 32-bit 2's complement type `int`,
+ * @ref INT_MIN is `-2147483648`, but the would-be result `2147483648` is
+ * greater than @ref INT_MAX, which is `2147483647`.
+ * 
+ * @see @ref fabs, @ref fabsf, @ref fabsl, @copybrief fabs
+ * @see @ref cabs, @ref cabsf, @ref cabsl, @copybrief cabs
+*/
+extern int abs(int n);
+/** @copydoc abs */
+extern long labs(long n);
+/** @copydoc abs */
+extern long long llabs(long long n);
+
+/** @brief Computes quotient and remainder of integer division
+ * 
+ * Computes both the quotient and the remainder of the division of the numerator
+ * `x` by the denominator `y`.
+ * 
+ * Computes the quotient and remainder simultaneously.
+ * 
+ * If either the remainder or the quotient cannot be represented, the behaviour
+ * is undefined.
+ * 
+ * @param x Integer numerator
+ * @param y Integer denominator
+ * 
+ * @returns If both the remainder and the quotient can be represented as objects
+ * of the corresponding type (`int, `long`, `long long`, `intmax_t`), returns
+ * both quotient and remainder as an object of type @ref div_t, @ref ldiv_t,
+ * @ref lldiv_t, @ref imaxdiv_t respectively.
+ * 
+ * @note On many platforms, a single CPU instruction obtains both the quotient
+ * and the remainder, and this function may leverage that, although compilers
+ * are generally able to merge nearby `/` and `%` where suitable.
+ * 
+ * @see @ref fmod, @ref fmodf, @ref fmodl, @copybrief fmod
+ * @see @ref remainder, @ref remainderf, @ref remainderl, @copybrief remainder
+ * @see @ref remquo, @ref remquof, @ref remquol, @copybrief remquo
+*/
+extern div_t div(int x, int y);
+/** @copydoc div */
+extern ldiv_t ldiv(long x, long y);
+/** @copydoc div */
+extern lldiv_t lldiv(long long x, long long y);
 
 #endif
 
@@ -157,23 +224,7 @@ extern void abort(void) __attribute__((__noreturn__));
 // #include <stddef.h>
 
 // /* Types */
-// /// Structure returned by @ref div
-// typedef struct {
-// 	int quot; ///< Quotient
-// 	int rem;  ///< Remainder
-// } div_t;
 
-// /// Structure returned by @ref ldiv
-// typedef struct {
-// 	long int quot; ///< Quotient
-// 	long int rem;  ///< Remainder
-// } ldiv_t;
-
-// /// Structure returned by @ref lldiv
-// typedef struct {
-// 	long long int quot; ///< Quotient
-// 	long long int rem;  ///< Remainder
-// } lldiv_t;
 
 
 // /* String conversion */

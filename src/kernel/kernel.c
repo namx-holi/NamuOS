@@ -19,7 +19,7 @@
 // DEBUG: Testing imports. These are what we are currently implementing
 #include <locale.h>
 #include <ctype.h>
-
+#include <stdlib.h>
 
 // Needed for kernel_main
 #include <assert.h>
@@ -35,7 +35,7 @@ void kernel_main(void) {
 	printf("test val is %d\n", 1234);
 	int len = printf("what about negatives? %d\n", -4321);
 	printf("length of last line? %d\n", len);
-	printf("\n\n");
+	printf("\n");
 
 	// Testing tolower
 	for (unsigned char u = 0; u < UCHAR_MAX; u++) {
@@ -43,6 +43,10 @@ void kernel_main(void) {
 		if (l != u) printf("%c%c ", u, l);
 	}
 	printf("\n\n");
+
+	// Testing div
+	div_t d = div(20, 7);
+	printf("20 / 7 is %d remainder %d\n\n", d.quot, d.rem);
 
 	// Testing asserts
 	assert(0==1);

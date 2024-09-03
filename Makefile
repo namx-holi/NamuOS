@@ -37,6 +37,7 @@ install_headers:
 	mkdir -p $(SYSROOT)/usr/include
 	cp -R --preserve=timestamps include/libc/. $(SYSROOT)/usr/include/.
 	cp -R --preserve=timestamps include/kernel/. $(SYSROOT)/usr/include/.
+# TODO: Include ~/opt/cross/lib/gcc/i686-elf/15.0.0/include/.
 
 
 build_project:
