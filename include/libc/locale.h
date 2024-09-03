@@ -8,8 +8,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/locale)
  * for **Localisation library**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/locale)
- * for **Localisation library**
  * 
  * @{
 */

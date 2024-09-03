@@ -9,8 +9,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/numeric/math)
  * for **Common mathematical functions**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/math)
- * for **Common mathematical functions**
  * 
  * @{
 */

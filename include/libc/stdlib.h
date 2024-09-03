@@ -7,48 +7,21 @@
  * @todo Detailed description
  * @todo See X documentation
  * 
-
-
- * 
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/memory)
  * for **Dynamic memory management**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/memory/c)
- * for **C memory management library**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/program)
  * for **Program support utilities**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/program)
- * for **Program support utilities**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/byte)
  * for **Null-terminated byte strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/byte)
- * for **Null-terminated byte strings**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/multibyte)
  * for **Null-terminated multibyte strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/multibyte)
- * for **Null-terminated multibyte strings**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/wide)
  * for **Null-terminated wide strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/wide)
- * for **Null-terminated wide strings**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/numeric/random)
  * for **Pseudo-random number generation**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/random)
- * for **Pseudo-random number generation**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/algorithm)
  * for **Algorithms library**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/algorithm)
- * for **Algorithms library**
- * 
  *  @see [C documentation](https://en.cppreference.com/w/c/numeric/math)
- * for **Common mathematical functions**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/math)
  * for **Common mathematical functions**
  * 
  * @{
@@ -154,10 +127,6 @@ extern void abort(void) __attribute__((__noreturn__));
 // TODO: div_t
 // TODO: ldiv_t
 // TODO: lldiv_t
-
-
-
-
 
 #endif
 

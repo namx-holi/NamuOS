@@ -9,8 +9,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/chrono)
  * for **Date and time utilities**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/chrono/c)
- * for **C date and time utilities**
  * 
  * @{
 */

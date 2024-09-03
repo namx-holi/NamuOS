@@ -11,12 +11,7 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/types/integer)
  * for **Fixed width integer types**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/types/integer)
- * for **Fixed width integer types**
- * 
  * @see [C documentation](https://en.cppreference.com/w/c/numeric/math)
- * for **Common mathematical functions**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/math)
  * for **Common mathematical functions**
  * 
  * @{

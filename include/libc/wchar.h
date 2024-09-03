@@ -9,15 +9,11 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/io)
  * for **File input/output**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/io)
- * for **File input/output**
  * 
  * @todo chrono ref
  * @todo multibyte ref
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/wide)
- * for **Null-terminated wide strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/wide)
  * for **Null-terminated wide strings**
  * 
  * @{

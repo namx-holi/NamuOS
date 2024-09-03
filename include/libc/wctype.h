@@ -9,8 +9,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/wide)
  * for **Null-terminated wide strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/wide)
- * for **Null-terminated wide strings**
  * 
  * @{
 */

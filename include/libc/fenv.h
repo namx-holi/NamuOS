@@ -8,8 +8,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/numeric/fenv)
  * for **Floating-point environment**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/fenv)
- * for **Floating-point environment**
  * 
  * @{
 */

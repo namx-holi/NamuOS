@@ -13,8 +13,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/error)
  * for **Error handling**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/error)
- * for **Error handling**
  * 
  * @todo Implementation for bounds checking?
  * 

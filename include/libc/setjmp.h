@@ -8,8 +8,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/program)
  * for **Program support utilities**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/program)
- * for **Program support utilities**
  * 
  * @{
 */

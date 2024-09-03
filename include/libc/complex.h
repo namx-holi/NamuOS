@@ -51,8 +51,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/numeric/complex)
  * for **Complex number arithmetic**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex)
- * for **Complex number arithmetic**
  * 
  * @{
 */

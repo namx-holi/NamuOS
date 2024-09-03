@@ -11,8 +11,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/thread)
  * for **Concurrency support library**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/thread)
- * for **Concurrency support library**
  * 
  * @{
 */

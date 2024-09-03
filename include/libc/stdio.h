@@ -9,8 +9,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/io)
  * for **File input/output**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/io)
- * for **File input/output**
  * 
  * @{
 */

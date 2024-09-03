@@ -9,8 +9,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/byte)
  * for **Null-terminated byte strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/byte)
- * for **Null-terminated byte strings**
  * 
  * @{
 */

@@ -9,8 +9,6 @@
  * 
  * @see [C documentation](https://en.cppreference.com/w/c/string/multibyte)
  * for **Null-terminated multibyte strings**
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/string/multibyte)
- * for **Null-terminated multibyte strings**
  * 
  * @{
 */
