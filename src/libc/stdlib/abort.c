@@ -14,5 +14,6 @@ void abort(void) {
 	printf("abort()\n");
 #endif
 	while (1) { }
+	// TODO: Sleep? So it doesn't nuke
 	__builtin_unreachable();
 }

@@ -32,14 +32,126 @@
 #ifndef _LIBC_STDLIB_H
 #define _LIBC_STDLIB_H 1
 
+#include <stddef.h> // size_t
+
 // Ref: https://en.cppreference.com/w/c/memory
-// TODO: malloc
-// TODO: calloc
-// TODO: realloc
-// TODO: free
-// TODO: free_sized
-// TODO: free_aligned_sized
-// TODO: aligned_alloc
+/** @brief Allocates memory
+ * 
+ * Allocates `size` bytes of uninitialised storage.
+ * 
+ * If allocation succeeds, returns a pointer that is suitably aligned for any
+ * object type with
+ * [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment).
+ * 
+ * If `size` is zero, the behaviour of `malloc` is implementation defined. For
+ * example, a null pointer may be returned. Alternatively, a non-null pointer
+ * may be returned; but such a pointer should not be dereferenced, and should be
+ * passed to @ref free to avoid memory leaks.
+ * 
+ * `malloc` is thread-safe: It behaves as though only accessing the memory
+ * locations visible through its argument, and not any static storage.
+ * 
+ * A previous call to @ref free, @ref free_sized, and @ref free_aligned_sized or
+ * @ref realloc that deallocates a region of memory *synchronises-with* a call
+ * to `malloc` that allocates the same or a part of the same region of memory.
+ * This synchronisation occurs after any access to the memory by the
+ * deallocating function and before any access to the memory by `malloc`. There
+ * is a single total order of all allocation and deallocation functions
+ * operating on each particular region of memory.
+ * 
+ * @param size Number of bytes to allocate
+ * 
+ * @returns On success, returns the pointer to the beginning of newly allocated
+ * memory. To avoid a memory leak, the returned pointer must be deallocated with
+ * @ref free or @ref realloc.
+ * @returns On failure, returns a null pointer.
+ * 
+ * @see @ref free @copybrief free
+*/
+extern void* malloc(size_t size);
+
+/** @brief Allocates and zeroes memory
+ * 
+ * Allocates memory for an array of `num` objects of `size` and initialises all
+ * bytes in the allocated storage to zer.
+ * 
+ * If allocation succeeds, returns a pointer to the lowest (first) byte in the
+ * allocated memory block that is suitably aligned for any object type with
+ * [fundamental alignment](https://en.cppreference.com/w/c/language/object#Alignment).
+ * 
+ * If `size` is zero, the behaviour is implementation defined (null pointer may
+ * be returned, or some non-null pointer may be returned that may not be used to
+ * access storage).
+ * 
+ * `calloc` is thread-safe: It behaves as though only accessing the memory
+ * locations visible through its argument, and not any static storage.
+ * 
+ * A previous call to @ref free, @ref free_sized, and @ref free_aligned_sized or
+ * @ref realloc that deallocates a region of memory *synchronises-with* a call
+ * to `calloc` that allocates the samemor a part of the same region of memory.
+ * This synchronisation occurs after any access to the memory by the
+ * deallocating function and before any access to the memory by `calloc`. There
+ * is a single total order of all allocation and deallocation functions
+ * operating on each particular region of memory.
+ * 
+ * @param num Number of objects
+ * @param size Size of each object
+ * 
+ * @returns On success, returns the pointer to the beginning of newly allocated
+ * memory. To avoid a memory leak, the returned pointer must be deallocated with
+ * @ref free or @ref realloc.
+ * @returns On failure, returns a null pointer.
+ * 
+ * @note Due to the alignment requirements, the number of allocated bytes is not
+ * necessarily equal to `num * size`.
+ * @note Initialisation to all bits zero does not guarantee that a
+ * floating-point or a pointer would be initialised to `0.0` and the null
+ * pointer respectively (although that is true on all common platforms).
+ * @note Originally (in C89), support for the zero size was added to
+ * accomodate code such as
+ * ```c
+ * OBJ* p = calloc(0, sizeof(OBJ)); // "zero-length" placeholder
+ * ...
+ * while (1) {
+ *   p = realloc(p, c * sizeof(OBJ)); // reallocations until size settles
+ *   ... // code that may change c or break out of loop
+ * }
+ * ```
+*/
+extern void* calloc(size_t num, size_t size);
+
+/** @brief Expands previously allocated memory block
+ * 
+ * @todo Detailed description
+*/
+extern void* realloc(void* ptr, size_t new_size);
+
+/** @brief Deallocates previously allocated memory block
+ * 
+ * @todo Detailed description
+*/
+extern void free(void* ptr);
+
+/** @brief Deallocates previously allocated sized memory
+ * 
+ * @todo Detailed description
+*/
+extern void free_sized(void* ptr, size_t size);
+
+/** @brief Deallocates previously allocated sized and aligned memory
+ * 
+ * @todo Detailed description
+*/
+extern void free_aligned_sized(void* ptr, size_t alignment, size_t size);
+
+/** @brief Allocates aligned memory
+ * 
+ * @todo Detailed description
+*/
+extern void* aligned_alloc(size_t alignment, size_t size);
+
+
+// Ref: https://en.cppreference.com/w/c/program
 
 /** @brief Causes abnormal program termination (without cleaning up)
  * 
@@ -67,17 +179,98 @@
 */
 extern void abort(void) __attribute__((__noreturn__));
 
-// Ref: https://en.cppreference.com/w/c/program
-// TODO: exit
-// TODO: quick_exit
-// TODO: _Exit
-// TODO: atexit
-// TODO: at_quick_exit
-// TODO: EXIT_SUCCESS
-// TODO: EXIT_FAILURE
-// TODO: system
-// TODO: getenv
-// TODO: getenv_s
+/** @brief Causes normal program termination with cleaning up
+ * 
+ * @todo Detailed description
+*/
+extern void exit(int exit_code) __attribute__((__noreturn__));
+
+/** @brief Causes normal program termination without completely cleaning up
+ * 
+ * @todo Detailed description
+*/
+extern void quick_exit(int exit_code) __attribute__((__noreturn__));
+
+/** @brief Causes normal program termination without cleaning up
+ * 
+ * @todo Detailed description
+*/
+extern void _Exit(int exit_code) __attribute__((__noreturn__));
+
+/** @brief Registers a function to be called on @ref exit invocation
+ * 
+ * @todo Detailed description
+*/
+extern int atexit(void (*func)(void));
+
+/** @brief Registers a function to be called on @ref quick_exit invocation
+ * 
+ * @todo Detailed description
+*/
+extern int at_quick_exit(void (*func)(void));
+
+/** @brief Indicates successful execution of a program
+ * 
+ * The `EXIT_SUCCESS` and @ref EXIT_FAILURE macros expand into integral
+ * expressions that can be used as arguments to the @ref exit function (and,
+ * therefore, as the values to return from the main function), and indicate
+ * program execution status (`EXIT_SUCCESS` for successful execution, and
+ * @ref EXIT_FAILURE for unsuccessful execution).
+ * 
+ * @note Both `EXIT_SUCCESS` and the value zero indicate successful program
+ * execution status (see @ref exit), although it is not required that
+ * `EXIT_STATUS` equals zero.
+*/
+#define EXIT_SUCCESS 0
+
+/** @brief Indicates unsuccessful execution of a program
+ * 
+ * The @ref EXIT_SUCCESS and `EXIT_FAILURE` macros expand into integral
+ * expressions that can be used as arguments to the @ref exit function (and,
+ * therefore, as the values to return from the main function), and indicate
+ * program execution status (@ref EXIT_SUCCESS for successful execution, and
+ * `EXIT_FAILURE` for unsuccessful execution).
+*/
+#define EXIT_FAILURE 1
+
+/** @brief Calls the host environment's command processor
+ * 
+ * Calls the host environment's command processor with the parameter `command`.
+ * Returns an implementation-defined value (usually the value that the invoked
+ * program returns).
+ * 
+ * If `command` is a null pointer, checks if the host environment has a command
+ * processor and returns a nonzero value if and only if the command processor
+ * exists.
+ * 
+ * @param command Character string identifying the command to be run in the
+ * command processor. If a null pointer is given, command processor is checked
+ * for existence.
+ * 
+ * @returns Implementation-defined value. If `command` is a null pointer,
+ * returns a nonzero value if and only if the command processor exists.
+ * 
+ * @note On POSIX systems, the return value can be decomposed using
+ * [`WEXITSTATUS` and `WSTOPSIG`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/wait.html).
+ * @note The related POSIX function
+ * [`popen`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/popen.html)
+ * makes the output generated by `command` available to the caller.
+*/
+extern int system(const char* command);
+
+/** @brief Access to the list of environment variables
+ * 
+ * @todo Detailed documentation
+*/
+extern char* getenv(const char* name);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+/** @copybrief getenv
+ * 
+ * @todo Detailed doc
+*/
+extern errno_t getenv_s(size_t* restrict len, char* restrict value, rsize_t valuesz, const char* restrict name);
+#endif
+
 
 // Ref: https://en.cppreference.com/w/c/string/byte
 // TODO: atof

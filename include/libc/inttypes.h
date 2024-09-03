@@ -23,8 +23,10 @@
 // TODO: Include <stdint.h>
 // TODO: Format macro constants. See https://en.cppreference.com/w/c/types/integer
 
+/** @copydoc stdlib.h::abs */
+intmax_t imaxabs(intmax_t n);
+
 // Ref: https://en.cppreference.com/w/c/numeric/math
-// TODO: imaxabs
 // TODO: imaxdiv
 // TODO: imaxdiv_t
 
