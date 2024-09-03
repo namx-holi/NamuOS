@@ -74,34 +74,8 @@ You can run the OS with qemu using `make qemu`
 - [OSDev - Bare Bones: Booting the Operating System](https://wiki.osdev.org/Bare_Bones#Booting_the_Operating_System)
 
 ## TODO
-- Implement C standard library
-	- complex.h
-		- Finish declarations
-		- Implementations (or disable)
-	- ctype.h
-		- Handle locale?
-	- errno.h
-	- fenv.h
-	- inttypes.h
-	- locale.h
-		- Implementations
-	- math.h
-		- Rewrite and document
-		- Implementations
-	- setjmp.h
-	- signal.h
-	- stdbit.h
-	- stdio.h
-		- Completely redocument
-		- Implementations
-	- stdlib.h
-		- Completely redocument
-		- Implementations
-	- string.h
-		- Rewrite and document
-	- threads.h
-	- time.h
-	- uchar.h
-	- wchar.h
-	- wctype.h
+- Finish documenting libc
+- Finish implementing libc
 - Implement a way to launch OS in debug mode within VS Code
+- Documentation for kernel side
+- Handle other C locales other than default?

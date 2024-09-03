@@ -10,5 +10,7 @@ size_t strlen(const char* str) {
 	return len;
 }
 
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 // TODO: strnlen_s
 // size_t strnlen_s(const char* str, size_t strsz);
+#endif

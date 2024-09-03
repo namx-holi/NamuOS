@@ -29,5 +29,7 @@ void* memmove(void* dest, const void* src, size_t count) {
 	return dest;
 }
 
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 // TODO: memmove_s
 // errno_t memmove_s(void* dest, rsize_t destsz, const void* src, rsize_t count);
+#endif

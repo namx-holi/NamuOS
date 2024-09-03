@@ -17,5 +17,7 @@ void* memset(void* dest, int ch, size_t count) {
 // TODO: memset_explicit
 // void* memset_explicit(void* dest, int ch, size_t count);
 
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 // TODO: memset_s
 // errno_t memset_s(void* dest, rsize_t destsz, int ch, rsize_t count);
+#endif

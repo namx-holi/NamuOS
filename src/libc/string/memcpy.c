@@ -16,5 +16,7 @@ void* memcpy(void* restrict dest, const void* restrict src, size_t count) {
 	return dest;
 }
 
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 // TODO: memcpy_s
 // errno_t memcpy_s(void* restrict dest, rsize_t destsz, const void* restrict src, rsize_t count);
+#endif

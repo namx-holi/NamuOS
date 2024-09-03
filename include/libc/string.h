@@ -44,6 +44,7 @@
  * @see @ref mblen @copybrief mblen
 */
 extern size_t strlen(const char* str);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 /** @copybrief strlen
  * 
  * Returns the length of the given null-terminated byte string, that is, the
@@ -67,6 +68,7 @@ extern size_t strlen(const char* str);
  * to provide limited support for non-null terminated strings.
 */
 extern size_t strnlen_s(const char* str, size_t strsz);
+#endif
 
 // Ref: https://en.cppreference.com/w/c/string/byte
 // TODO: strcmp
@@ -188,6 +190,7 @@ extern void* memset(void* dest, int ch, size_t count);
  * @see @ref wmemset @ref wmemset
 */
 extern void* memset_explicit(void* dest, int ch, size_t count);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 /** @copybrief memset
  * 
  * Copies the value `(unsigned char)ch` into each of the first `count`
@@ -217,7 +220,8 @@ extern void* memset_explicit(void* dest, int ch, size_t count);
  * @see @ref memcpy and @ref memcpy_s, @copybrief memcpy
  * @see @ref wmemset @ref wmemset
 */
-// extern errno_t memset_s(void* dest, rsize_t destsz, int ch, rsize_t count);
+extern errno_t memset_s(void* dest, rsize_t destsz, int ch, rsize_t count);
+#endif
 
 /** @brief Copies one buffer to another
  * 
@@ -255,8 +259,10 @@ extern void* memset_explicit(void* dest, int ch, size_t count);
  * @see @ref wmemcpy and @ref wmemcpy_s, @copybrief wmemcpy
 */
 extern void* memcpy(void* restrict dest, const void* restrict src, size_t count);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 // TODO: Doc for memcpy_s
-// extern errno_t memcpy_s(void* restrict dest, rsize_t destsz, const void* restrict src, rsize_t count);
+extern errno_t memcpy_s(void* restrict dest, rsize_t destsz, const void* restrict src, rsize_t count);
+#endif
 
 /** @brief Moves one buffer to another
  * 
@@ -294,8 +300,10 @@ extern void* memcpy(void* restrict dest, const void* restrict src, size_t count)
  * @see @ref wmemmove and @ref wmemmove_s, @copybrief wmemmove
 */
 extern void* memmove(void* dest, const void* src, size_t count);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
 // TODO: Doc for memmove_s
-// extern errno_t memmove_s(void* dest, rsize_t destsz, const void* src, rsize_t count);
+extern errno_t memmove_s(void* dest, rsize_t destsz, const void* src, rsize_t count);
+#endif
 
 /** @brief Copies one buffer to another, stopping after the specified delimiter
  * 
