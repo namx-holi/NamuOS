@@ -15,10 +15,10 @@ sudo apt install qemu-system qemu-utils
 ```
 
 Some info on these packages:
-- (bison)[https://www.gnu.org/software/bison/]
-- (flex)[https://www.gnu.org/software/flex/]
-- (texinfo)[https://www.gnu.org/software/texinfo/]
-- (qemu)[https://www.qemu.org/]
+- [bison](https://www.gnu.org/software/bison/)
+- [flex](https://www.gnu.org/software/flex/)
+- [texinfo](https://www.gnu.org/software/texinfo/)
+- [qemu](https://www.qemu.org/)
 
 If documentation is to be generated,
 ```sh
