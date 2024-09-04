@@ -28,17 +28,21 @@
 
 
 void kernel_main(void) {
-	terminal_initialize();
+	terminal_initialise();
 
 	// Testing printing
-	printf("Hello, kernel World!\n");
-	printf("test val is %d\n", 1234);
-	int len = printf("what about negatives? %d\n", -4321);
-	printf("length of last line? %d\n", len);
-	printf("\n");
+	printf("Hello, kernel world!\n");
+	printf("Printing number 1234 using format: %d\n", 1234);
+	printf("Printing number -1234 using format: %d\n", -1234);
+	int len = printf("Testing counting line length...\n");
+	printf("Length of last line was %d (should be 33)\n", len);
+	printf("\tTesting indentation (should be indented by 4 characters)\n");
+	printf("Testing vertical tab, \vshould be under the last line\n");
+	printf("******* testing carriage return, should be no *s\rTesting\n");
 
 	// Testing tolower
-	for (unsigned char u = 0; u < UCHAR_MAX; u++) {
+	printf("\nTesting tolower, printing alphabet:\n");
+	for (unsigned char u = 0; u < UCHAR_MAX; ++u) {
 		unsigned char l = tolower(u);
 		if (l != u) printf("%c%c ", u, l);
 	}
@@ -46,8 +50,9 @@ void kernel_main(void) {
 
 	// Testing div
 	div_t d = div(20, 7);
-	printf("20 / 7 is %d remainder %d\n\n", d.quot, d.rem);
+	printf("Testing div(), 20 / 7 is %d remainder %d\n\n", d.quot, d.rem);
 
 	// Testing asserts
+	printf("Testing assertions:\n");
 	assert(0==1);
 }
