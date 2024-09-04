@@ -58,6 +58,8 @@
 #ifndef _LIBC_COMPLEX_H
 #define _LIBC_COMPLEX_H 1
 
+#ifdef __STDC_IEC_559_COMPLEX__ /* Complex numbers enabled */
+
 
 /********************************************************/
 /* Complex Number Arithmetic Functions                  */
@@ -492,6 +494,8 @@ long double complex cprojl(long double complex z);
 // TODO: casinh, computes the complex arc hyperbolic sine
 // TODO: cacosh, computes the complex arc hyperbolic cosine
 // TODO: catanh, computes the complex arc hyperbolic tangent
+
+#endif /* Complex numbers enabled */
 
 #endif
 
