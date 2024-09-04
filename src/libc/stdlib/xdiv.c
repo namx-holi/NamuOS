@@ -2,6 +2,7 @@
 
 #include <stdlib.h> // Implements
 
+
 div_t div(int x, int y) {
 	div_t val = {x / y, x % y};
 	return val;

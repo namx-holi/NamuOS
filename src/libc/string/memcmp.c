@@ -2,6 +2,7 @@
 
 #include <string.h> // Implements
 
+
 int memcmp(const void* lhs, const void* rhs, size_t count) {
 	// NOTE: Undefined if lhs/rhs are null. Ignore that case.
 

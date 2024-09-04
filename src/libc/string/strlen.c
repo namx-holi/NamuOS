@@ -2,6 +2,7 @@
 
 #include <string.h> // Implements
 
+
 size_t strlen(const char* str) {
 	// Count characters up to null term
 	size_t len = 0;

@@ -1,6 +1,4 @@
-/**
- * @file ctype.c
-*/
+/// @file ctype.c
 
 #include <ctype.h> // Implements
 

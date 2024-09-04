@@ -4,6 +4,7 @@
 
 #include <stdio.h> // printf
 
+
 __attribute__((__noreturn__))
 void abort(void) {
 #if defined(__is_libk)

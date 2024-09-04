@@ -2,6 +2,9 @@
 
 #include <kernel/vga.h> // Implements
 
+#include <stdint.h> // uint8_t, uint16_t
+
+
 inline uint8_t vga_entry_colour(enum vga_colour fg, enum vga_colour bg) {
 	// Background colour, followed by foreground colour
 	return bg << 4 | fg;

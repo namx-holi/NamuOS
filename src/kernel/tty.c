@@ -10,10 +10,8 @@
 
 #include <kernel/tty.h> // Implements
 
-// #include <stdbool.h>
-// #include <stddef.h>
-// #include <stdint.h>
-// #include <string.h>
+#include <stddef.h> // size_t
+#include <stdint.h> // uint8_t, uint16_t
 
 #include <kernel/vga.h>
 
@@ -100,6 +98,8 @@ void terminal_putchar(char ch) {
 	
 	// Handle any special printing characters
 	switch (ch) {
+		// TODO: Handle alert (\a), backspace (\b), form feed (\f)
+
 		case '\n': // Line feed (newline)
 			// Treat newline like unix, move to the start of the next line. Also
 			//  bounds check

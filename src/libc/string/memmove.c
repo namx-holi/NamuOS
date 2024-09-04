@@ -2,6 +2,7 @@
 
 #include <string.h> // Implements
 
+
 void* memmove(void* dest, const void* src, size_t count) {
 	// If pointers are the same, do nothing and just return dest
 	if (dest == src)

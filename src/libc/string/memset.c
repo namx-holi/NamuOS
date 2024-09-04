@@ -2,6 +2,7 @@
 
 #include <string.h> // Implements
 
+
 void* memset(void* dest, int ch, size_t count) {
 	// Interpret object as unsigned char*
 	unsigned char* d = (unsigned char*)dest;

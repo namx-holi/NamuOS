@@ -2,6 +2,7 @@
 
 #include <string.h> // Implements
 
+
 void* memcpy(void* restrict dest, const void* restrict src, size_t count) {
 	// Interpret both objects as unsigned char*
 	unsigned char* d = (unsigned char*)dest;
