@@ -35,7 +35,7 @@ void kernel_main(void) {
 	printf("Printing number 1234 using format: %d\n", 1234);
 	printf("Printing number -1234 using format: %d\n", -1234);
 	int len = printf("Testing counting line length...\n");
-	printf("Length of last line was %d (should be 33)\n", len);
+	printf("Length of last line was %d (should be 32)\n", len);
 	printf("\tTesting indentation (should be indented by 4 characters)\n");
 	printf("Testing tab alignment:\t1\t12\t123\t1234\t12341\t1234\n");
 	printf("Testing vertical tab, \vshould be under the last line\n");
