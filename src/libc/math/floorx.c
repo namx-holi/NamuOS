@@ -1,11 +1,11 @@
-/// @file floor.c
+/// @file floorx.c
 
 #include <stdint.h>
 #include <math.h>
 
-// TODO: Rewrite declaration and make sure this is built
+// TODO: Rewrite this a bit, and add floorf and floorl
 
-// https://stackoverflow.com/a/64409333/9330968
+// Ref: https://stackoverflow.com/a/64409333/9330968
 
 // INTMAX_MAX is not exact as a double, yet INTMAX_MAX + 1 is an exact
 //  double
@@ -29,3 +29,6 @@ double floor(double x) {
 
 	return x; // NaN
 }
+
+// TODO: floorf
+// TODO: floorl

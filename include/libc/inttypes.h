@@ -20,7 +20,7 @@
 #ifndef _LIBC_INTTYPES_H
 #define _LIBC_INTTYPES_H 1
 
-// TODO: Include <stdint.h>
+#include <stdint.h> // intmax_t
 
 
 /******************************************************/
@@ -38,9 +38,14 @@
 /** @copydoc stdlib.h::abs */
 intmax_t imaxabs(intmax_t n);
 
-// Ref: https://en.cppreference.com/w/c/numeric/math
-// TODO: imaxdiv
-// TODO: imaxdiv_t
+/** @brief Structure type, return of the @ref imaxdiv function */
+typedef struct {
+    intmax_t quot; ///< Quotient
+    intmax_t rem;  ///< Remainder
+} imaxdiv_t;
+
+/** @copydoc stdlib.h::div */
+imaxdiv_t imaxdiv(intmax_t x, intmax_t y);
 
 #endif
 

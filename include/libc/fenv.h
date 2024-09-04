@@ -32,17 +32,23 @@
 // TODO: fesetenv
 // TODO: feholdexcept
 // TODO: feupdateenv
-// TODO: FE_ALL_EXCEPT
-// TODO: FE_DIVBYZERO
-// TODO: FE_INEXACT
-// TODO: FE_INVALID
-// TODO: FE_OVERFLOW
-// TODO: FE_UNDERFLOW
-// TODO: FE_DOWNWARD
-// TODO: FE_TONEAREST
-// TODO: FE_TOWARDZERO
-// TODO: FE_UPWARD
-// TODO: FE_DFL_ENV
+
+// Floating-point exceptions
+// TODO: FE_DIVBYZERO  /* implementation defined power of 2 */
+// TODO: FE_INEXACT    /* implementation defined power of 2 */
+// TODO: FE_INVALID    /* implementation defined power of 2 */
+// TODO: FE_OVERFLOW   /* implementation defined power of 2 */
+// TODO: FE_UNDERFLOW  /* implementation defined power of 2 */
+// TODO: FE_ALL_EXCEPT /* | of all above */
+
+// Floating-point rounding direction
+// TODO: FE_DOWNWARD   /* implementation defined */
+// TODO: FE_TONEAREST  /* implementation defined */
+// TODO: FE_TOWARDZERO /* implementation defined */
+// TODO: FE_UPWARD     /* implementation defined */
+
+// Default floating-point environment
+// TODO: FE_DFL_ENV /* implementation defined */
 
 #endif
 

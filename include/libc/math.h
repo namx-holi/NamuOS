@@ -77,8 +77,87 @@
 // TODO: erfc, erfcf, erfcl
 // TODO: tgamma, tgammaf, tgammal
 // TODO: lgamma, lgammaf, lgammal
-// TODO: ceil, ceilf, ceill
-// TODO: floor, floorf, floorl (done for floor)
+
+/** @brief Computes smallest integer not less than the given value
+ * 
+ * Computes the smallest integer value not less than `arg`.
+ * 
+ * Errors are reported as specified in @ref math_errhandling. If the
+ * implementation supports IEEE floating-point arithmetic (IEC 60559):
+ * - The current [rounding mode](https://en.cppreference.com/w/c/numeric/fenv/FE_round) has no effect.
+ * - If `arg` is ±∞, it is returned, unmodified.
+ * - If `arg` is ±0, it is returned, unmodified.
+ * - If `arg` is NaN, NaN is returned.
+ * 
+ * @param arg Floating-point value
+ * 
+ * @returns If no errors occur, the smallest integer value not less than `arg`,
+ * that is \f$\lceil arg \rceil\f$, is returned.
+ * 
+ * @note @ref FE_INEXACT may be (but isn't required to be) raised when rounding
+ * a non-integer finite value.
+ * @note THe largest representable floating-point values are exact integers in
+ * all standard floating-point formats, so this function never overflows on its
+ * own; however the result may overflow any integer type (including
+ * @ref intmax_t), when stored in an integer variable.
+ * @note This function (for `double` argument) behaves as if (except for the
+ * freedom to not raise @ref FE_INEXACT) implemented by
+ * ```c
+ * #include <fenv.h>
+ * #include <math.h>
+ * #pragma STDC FENV_ACCESS ON
+ * 
+ * double ceil(double x) {
+ *   double result;
+ *   int save_round = fegetround();
+ *   fesetround(FE_UPWARD);
+ *   result = rint(x); // or nearbyint
+ *   fesetround(save_round);
+ *   return result;
+ * }
+ * ```
+ * 
+ * @see @ref floor, @ref floorf, @ref floorl, @copybrief floor
+ * @see @ref trunc, @ref truncf, @ref truncl, @copybrief trunc
+ * @see @ref round and variants, @copybrief round
+ * @see @ref nearbyint, @ref nearbyintf, @ref nearbyintl, @copybrief nearbyint
+ * @see @ref rint and variants, @copybrief rint
+*/
+extern double ceil(double arg);
+/** @copydoc ceil */
+extern float ceilf(float arg);
+/** @copydoc ceil */
+extern long double ceill(long double arg);
+
+/** @brief Computes largest integer not greater than the given value
+ * 
+ * Computes the largest integer value not greater than `arg`.
+ * 
+ * Errors are reported as specified in @ref math_errhandling. If the
+ * implementation supports IEEE floating-point arithmetic (IEC 60559):
+ * - The current [rounding mode](https://en.cppreference.com/w/c/numeric/fenv/FE_round) has no effect.
+ * - If `arg` is ±∞, it is returned, unmodified.
+ * - If `arg` is ±0, it is returned, unmodified.
+ * - If `arg` is NaN, NaN is returned.
+ * 
+ * @param arg Floating-point value
+ * 
+ * @returns If no errors occur, the largest integer value not greater than
+ * `arg`, that is \f$\lfloor arg \rfloor\f$, is returned.
+ * 
+ * @note @ref FE_INEXACT may be (but isn't required to be) raised when rounding
+ * a non-integer finite value.
+ * @note The largest representable floating-point values are exact integers in
+ * all standard floating-point formats, so this function never overflows on its
+ * own; however the result may overflow any integer type (including
+ * @ref intmax_t), when stored in an integer variable.
+*/
+extern double floor(double arg);
+/** @copydoc floor */
+extern float floorf(float arg);
+/** @copydoc floor */
+extern long double floorl(long double arg);
+
 // TODO: trunc, truncf, trunfl
 // TODO: round, roundf, roundl
 // TODO: lround, lroundf, lroundl
@@ -116,9 +195,13 @@
 // TODO: NAN
 // TODO: FP_FAST_FMA, FP_FAST_FMAF, FP_FAST_FMAL
 // TODO: FP_ILOGB0, FP_ILOGBNAN
-// TODO: math_errhandling
-// TODO: MATH_ERRNO
-// TODO: MATHERREXCEPT
+
+// TODO: Documentation
+// Ref: https://en.cppreference.com/w/c/numeric/math/math_errhandling
+#define MATH_ERRNO 1
+#define MATH_ERREXCEPT 2
+#define math_errhandling /* implementation defined */
+
 // TODO: FP_NORMAL
 // TODO: FP_SUBNORMAL
 // TODO: FP_ZERO
