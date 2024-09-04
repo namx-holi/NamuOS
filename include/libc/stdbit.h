@@ -14,6 +14,8 @@
 #ifndef _LIBC_STDBIT_H
 #define _LIBC_STDBIT_H 1
 
+// TODO: Find documentation for this header
+
 #endif
 
 /** @} */

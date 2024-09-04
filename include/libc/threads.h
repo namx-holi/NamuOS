@@ -18,7 +18,11 @@
 #ifndef _LIBC_THREADS_H
 #define _LIBC_THREADS_H 1
 
-// Ref: https://en.cppreference.com/w/c/thread
+
+/***********************************************/
+/* Concurrency Support Functions               */
+/* Ref: https://en.cppreference.com/w/c/thread */
+/***********************************************/
 // TODO: thrd_t
 // TODO: thrd_create
 // TODO: thrd_equal
@@ -53,7 +57,6 @@
 // TODO: tss_get
 // TODO: tss_set
 // TODO: tss_delete
-
 
 #endif
 

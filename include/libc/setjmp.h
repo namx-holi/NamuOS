@@ -15,7 +15,11 @@
 #ifndef _LIBC_SETJMP_H
 #define _LIBC_SETJMP_H 1
 
-// Ref: https://en.cppreference.com/w/c/program
+
+/************************************************/
+/* Program Support Functions                    */
+/* Ref: https://en.cppreference.com/w/c/program */
+/************************************************/
 // TODO: setjmp
 // TODO: longjmp
 // TODO: jmp_buf

@@ -16,6 +16,12 @@
 #ifndef _LIBC_MATH_H
 #define _LIBC_MATH_H 1
 
+
+/*****************************************************/
+/* Common Mathematical Functions                     */
+/* Ref: https://en.cppreference.com/w/c/numeric/math */
+/*****************************************************/
+
 // The <math.h> header provides for the following constants. The values
 //  are of type double and are accurate within the precision of the
 //  double type.
@@ -34,7 +40,6 @@
 #define M_SQRT2    1.41421356237309504880  ///< sqrt(2)
 #define M_SQRT1_2  0.70710678118654752440  ///< 1/sqrt(2)
 
-// Ref: https://en.cppreference.com/w/c/numeric/math
 // TODO: fabs, fabsf, fabsl
 // TODO: fmod, fmodf, fmodl
 // TODO: remainder, remainderf, remainderl

@@ -58,6 +58,12 @@
 #ifndef _LIBC_COMPLEX_H
 #define _LIBC_COMPLEX_H 1
 
+
+/********************************************************/
+/* Complex Number Arithmetic Functions                  */
+/* Ref: https://en.cppreference.com/w/c/numeric/complex */
+/********************************************************/
+
 /** @brief Imaginary type macro
  * 
  * This macro expands to the keyword @ref _Imaginary.

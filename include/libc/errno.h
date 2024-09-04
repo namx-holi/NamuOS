@@ -22,6 +22,12 @@
 #ifndef _LIBC_ERRNO_H
 #define _LIBC_ERRNO_H 1
 
+
+/**********************************************/
+/* Error Handling Functions                   */
+/* Ref: https://en.cppreference.com/w/c/error */
+/**********************************************/
+
 /** @brief Macro which expands to POSIX-compatible thread-local error number variable
  * 
  * `errno` is a preprocessor macro (but see note below) that expands to a

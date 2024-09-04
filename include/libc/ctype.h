@@ -15,6 +15,12 @@
 #ifndef _LIBC_CTYPE_H
 #define _LIBC_CTYPE_H 1
 
+
+/****************************************************/
+/* Null-Terminated Byte Functions                   */
+/* Ref: https://en.cppreference.com/w/c/string/byte */
+/****************************************************/
+
 /** @brief Checks if a character is alphanumeric
  * 
  * Checks if the given digit is an alphanumeric character as classified by the

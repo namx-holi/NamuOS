@@ -23,6 +23,12 @@
 #ifndef _LIBC_ASSERT_H
 #define _LIBC_ASSERT_H 1
 
+
+/**********************************************/
+/* Error Handling Functions                   */
+/* Ref: https://en.cppreference.com/w/c/error */
+/**********************************************/
+
 #ifdef NDEBUG
 #define assert(condition) ((void)0)
 #else

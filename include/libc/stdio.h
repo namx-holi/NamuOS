@@ -19,6 +19,12 @@
 #include <stddef.h> // size_t
 #include <stdarg.h> // va_list
 
+
+/*******************************************/
+/* File Input/Output Functions             */
+/* Ref: https://en.cppreference.com/w/c/io */
+/*******************************************/
+
 #define EOF (-1) ///< Integer constant expression of type `int` and negative value
 #define FOPEN_MAX 16 ///< Maximum number of files that can be open simultaneously
 #define FILENAME_MAX 4096 ///< Size needed for an array of `char` to hold the longest supported file name
@@ -63,9 +69,8 @@
 */
 typedef struct {} FILE; // TODO: Implement
 
-// Ref: https://en.cppreference.com/w/c/io
 // TODO: fpos_t
-// TODO stdin, stdout, stderr
+// TODO: stdin, stdout, stderr
 // TODO: fopen, fopen_s
 // TODO: freopen, freopen_s
 // TODO: fclose
@@ -126,7 +131,6 @@ extern int putchar(int ch);
 */
 int puts(const char* str);
 
-// Ref: https://en.cppreference.com/w/c/io
 // TODO: ungetc
 // TODO: scanf, fscanf, sscanf, scanf_s, fscanf_s, sscanf_s
 // TODO: vscanf, vfscanf, vsscanf, vscanf_s, vfscanf_s, vsscanf_s
@@ -186,7 +190,6 @@ extern int vfprintf_s(FILE* restrict stream, const char* restrict format, va_lis
 // extern int vsnprintf_s(char* restrict buffer, rsize_t bufsz, const char* restrict format, va_list vlist);
 #endif
 
-// Ref: https://en.cppreference.com/w/c/io
 // TODO: ftell
 // TODO: fgetpos
 // TODO: fseek

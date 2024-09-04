@@ -15,7 +15,11 @@
 #ifndef _LIBC_SIGNAL_H
 #define _LIBC_SIGNAL_H 1
 
-// Ref: https://en.cppreference.com/w/c/program
+
+/************************************************/
+/* Program Support Functions                    */
+/* Ref: https://en.cppreference.com/w/c/program */
+/************************************************/
 // TODO: signal
 // TODO: raise
 // TODO: sig_atomic_t

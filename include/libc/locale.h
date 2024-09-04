@@ -15,6 +15,12 @@
 #ifndef _LIBC_LOCALE_H
 #define _LIBC_LOCALE_H
 
+
+/***********************************************/
+/* Localisation Support Functions              */
+/* Ref: https://en.cppreference.com/w/c/locale */
+/***********************************************/
+
 /** @brief Formatting details, returned by @ref localeconv
  * 
  * The struct `lconv` contains numeric and monetary formatting rules as defined

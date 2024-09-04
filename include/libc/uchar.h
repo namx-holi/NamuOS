@@ -16,7 +16,11 @@
 #ifndef _LIBC_UCHAR_H
 #define _LIBC_UCHAR_H 1
 
-// Ref: https://en.cppreference.com/w/c/string/multibyte
+
+/*********************************************************/
+/* Null-Terminated Multibyte String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/multibyte */
+/*********************************************************/
 // TODO: mbrtoc8
 // TODO: c8rtomb
 // TODO: mbrtoc16

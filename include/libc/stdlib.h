@@ -34,7 +34,12 @@
 
 #include <stddef.h> // size_t
 
-// Ref: https://en.cppreference.com/w/c/memory
+
+/***********************************************/
+/* Dynamic Memory Management Functions         */
+/* Ref: https://en.cppreference.com/w/c/memory */
+/***********************************************/
+
 /** @brief Allocates memory
  * 
  * Allocates `size` bytes of uninitialised storage.
@@ -151,7 +156,10 @@ extern void free_aligned_sized(void* ptr, size_t alignment, size_t size);
 extern void* aligned_alloc(size_t alignment, size_t size);
 
 
-// Ref: https://en.cppreference.com/w/c/program
+/************************************************/
+/* Program Support Functions                    */
+/* Ref: https://en.cppreference.com/w/c/program */
+/************************************************/
 
 /** @brief Causes abnormal program termination (without cleaning up)
  * 
@@ -272,7 +280,10 @@ extern errno_t getenv_s(size_t* restrict len, char* restrict value, rsize_t valu
 #endif
 
 
-// Ref: https://en.cppreference.com/w/c/string/byte
+/****************************************************/
+/* Null-Terminated Byte Functions                   */
+/* Ref: https://en.cppreference.com/w/c/string/byte */
+/****************************************************/
 // TODO: atof
 // TODO: atoi
 // TODO: atol
@@ -291,7 +302,10 @@ extern errno_t getenv_s(size_t* restrict len, char* restrict value, rsize_t valu
 // TODO: strtoumax
 
 
-// Ref: https://en.cppreference.com/w/cpp/string/multibyte
+/*********************************************************/
+/* Null-Terminated Multibyte String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/multibyte */
+/*********************************************************/
 // TODO: mblen
 // TODO: mbtowc
 // TODO: wctomb, wctomb_s
@@ -300,34 +314,48 @@ extern errno_t getenv_s(size_t* restrict len, char* restrict value, rsize_t valu
 // TODO: MB_CUR_MAX
 
 
-// Ref: https://en.cppreference.com/w/c/string/wide
+/****************************************************/
+/* Null-Terminated Wide String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/wide */
+/****************************************************/
 // TODO: wchar_t (in stdlib.h, wchar.h)
 
 
-// Ref: https://en.cppreference.com/w/c/numeric/random
+/*******************************************************/
+/* Pseudo-Random Number Generation Functions           */
+/* Ref: https://en.cppreference.com/w/c/numeric/random */
+/*******************************************************/
 // TODO: rand
 // TODO: srand
-// TODO: RAND_MAX
+// TODO: RAND_MAX, 2147483647, same as INT_MAX
 
 
-// Ref: https://en.cppreference.com/w/c/algorithm
+/**************************************************/
+/* Algorithm Functions                            */
+/* Ref: https://en.cppreference.com/w/c/algorithm */
+/**************************************************/
 // TODO: qsort, qsort_s
 // TODO: bsearch, bsearch_s
 
 
-/** @brief Structure returned by @ref div */
+/*****************************************************/
+/* Common Mathematical Functions                     */
+/* Ref: https://en.cppreference.com/w/c/numeric/math */
+/*****************************************************/
+
+/** @brief Structure type, return of the @ref div function */
 typedef struct {
     int quot; ///< Quotient
     int rem;  ///< Remainder
 } div_t;
 
-/** @brief Structure returned by @ref ldiv */
+/** @brief Structure type, return of the @ref ldiv function */
 typedef struct {
     long quot; ///< Quotient
     long rem;  ///< Remainder
 } ldiv_t;
 
-/** @brief Structure returned by @ref lldiv */
+/** @brief Structure type, return of the @ref lldiv function */
 typedef struct {
     long long quot; ///< Quotient
     long long rem;  ///< Remainder

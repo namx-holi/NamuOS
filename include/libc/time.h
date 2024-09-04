@@ -16,7 +16,11 @@
 #ifndef _LIBC_TIME_H
 #define _LIBC_TIME_H 1
 
-// Ref: https://en.cppreference.com/w/c/chrono
+
+/***********************************************/
+/* Date And Times Utility Functions            */
+/* Ref: https://en.cppreference.com/w/c/chrono */
+/***********************************************/
 // TODO: difftime
 // TODO: time
 // TODO: clock
@@ -33,7 +37,6 @@
 // TODO: time_t
 // TODO: clock_t
 // TODO: timespec
-
 
 #endif
 

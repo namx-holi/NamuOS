@@ -15,7 +15,10 @@
 #ifndef _LIBC_FENV_H
 #define _LIBC_FENV_H 1
 
-// Ref: https://en.cppreference.com/w/c/numeric/fenv
+/*****************************************************/
+/* Floating-Point Environment Functions              */
+/* Ref: https://en.cppreference.com/w/c/numeric/fenv */
+/*****************************************************/
 // TODO: fenv_t
 // TODO: fexcept_t
 // TODO: feclearexcept

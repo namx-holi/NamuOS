@@ -22,7 +22,11 @@
 #ifndef _LIBC_WCHAR_H
 #define _LIBC_WCHAR_H 1
 
-// Ref: https://en.cppreference.com/w/c/io
+
+/*******************************************/
+/* File Input/Output Functions             */
+/* Ref: https://en.cppreference.com/w/c/io */
+/*******************************************/
 // TODO: fwide
 // TODO: fgetwc, getwc
 // TODO: fgetws
@@ -36,10 +40,18 @@
 // TODO: wprintf, fwprintf, swprintf, wprintf_s, fwprintf_s, swprintf_s, snwprintf_s
 // TODO: vwprintf, vfwprintf, vswprintf, vfwprintf_s, vfwprintf_s, vswprintf_s, vsnwprintf_s
 
-// Ref: https://en.cppreference.com/w/c/chrono
+
+/***********************************************/
+/* Date And Times Utility Functions            */
+/* Ref: https://en.cppreference.com/w/c/chrono */
+/***********************************************/
 // TODO: wcsftime
 
-// Ref: https://en.cppreference.com/w/c/string/multibyte
+
+/*********************************************************/
+/* Null-Terminated Multibyte String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/multibyte */
+/*********************************************************/
 // TODO: mbsinit
 // TODO: btowc
 // TODO: wctob
@@ -49,7 +61,11 @@
 // TODO: mbsrtowcs, mbsrtowcs_s
 // TODO: mbstate_t
 
-// Ref: https://en.cppreference.com/w/c/string/wide
+
+/****************************************************/
+/* Null-Terminated Wide String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/wide */
+/****************************************************/
 // TODO: wcstol, wcstoll
 // TODO: wcstoul, wcstoull
 // TODO: wcstof, wcstod, wcstold
@@ -78,7 +94,6 @@
 // TODO: WEOF (in wchar.h, wctype.h)
 // TODO: WCHAR_MIN
 // TODO: WCHAR_MAX
-
 
 #endif
 

@@ -18,7 +18,11 @@
 
 #include <stddef.h> // size_t
 
-// Ref: https://en.cppreference.com/w/c/string/byte
+
+/****************************************************/
+/* Null-Terminated Byte Functions                   */
+/* Ref: https://en.cppreference.com/w/c/string/byte */
+/****************************************************/
 // TODO: strcpy, strcpy_s
 // TODO: strncpy, strncpy_s
 // TODO: strcat, strcat_s
@@ -70,7 +74,6 @@ extern size_t strlen(const char* str);
 extern size_t strnlen_s(const char* str, size_t strsz);
 #endif
 
-// Ref: https://en.cppreference.com/w/c/string/byte
 // TODO: strcmp
 // TODO: strncmp
 // TODO: strcoll
@@ -359,7 +362,6 @@ extern errno_t memmove_s(void* dest, rsize_t destsz, const void* src, rsize_t co
 */
 extern void* memccpy(void* restrict dest, const void* restrict src, int c, size_t count);
 
-// Ref: https://en.cppreference.com/w/c/string/byte
 // TODO: strerror, strerror_s, strerrorlen_s
 
 #endif

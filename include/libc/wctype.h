@@ -16,7 +16,11 @@
 #ifndef _LIBC_WCTYPE_H
 #define _LIBC_WCTYPE_H 1
 
-// Ref: https://en.cppreference.com/w/c/string/wide
+
+/****************************************************/
+/* Null-Terminated Wide String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/wide */
+/****************************************************/
 // TODO: iswalnum
 // TODO: iswalpha
 // TODO: iswlower

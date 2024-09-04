@@ -21,7 +21,19 @@
 #define _LIBC_INTTYPES_H 1
 
 // TODO: Include <stdint.h>
+
+
+/******************************************************/
+/* Fixed Width Integer Types                          */
+/* Ref: https://en.cppreference.com/w/c/types/integer */
+/******************************************************/
 // TODO: Format macro constants. See https://en.cppreference.com/w/c/types/integer
+
+
+/*****************************************************/
+/* Common Mathematical Functions                     */
+/* Ref: https://en.cppreference.com/w/c/numeric/math */
+/*****************************************************/
 
 /** @copydoc stdlib.h::abs */
 intmax_t imaxabs(intmax_t n);
