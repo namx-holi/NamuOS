@@ -37,6 +37,7 @@ void kernel_main(void) {
 	int len = printf("Testing counting line length...\n");
 	printf("Length of last line was %d (should be 33)\n", len);
 	printf("\tTesting indentation (should be indented by 4 characters)\n");
+	printf("Testing tab alignment:\t1\t12\t123\t1234\t12341\t1234\n");
 	printf("Testing vertical tab, \vshould be under the last line\n");
 	printf("******* testing carriage return, should be no *s\rTesting\n");
 

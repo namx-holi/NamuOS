@@ -119,10 +119,9 @@ void terminal_putchar(char ch) {
 			return;
 		
 		case '\t': // Horizontal tab
-			// Move across the tab size, and bounds check for width
+			// Move across to next alignment of tab width
 			// TODO: Define default tab width somewhere
-			// TODO: Handle alignment
-			terminal_column += 4; 
+			terminal_column += 4 - (terminal_column % 4);
 			terminal_boundscheck();
 			return;
 
