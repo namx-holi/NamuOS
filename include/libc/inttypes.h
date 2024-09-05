@@ -13,6 +13,8 @@
  * for **Fixed width integer types**
  * @see [C documentation](https://en.cppreference.com/w/c/numeric/math)
  * for **Common mathematical functions**
+ * @see [C documentation](https://en.cppreference.com/w/c/string/byte)
+ * for **Null-terminated byte strings**
  * 
  * @{
 */
@@ -46,6 +48,17 @@ typedef struct {
 
 /** @copydoc stdlib.h::div */
 imaxdiv_t imaxdiv(intmax_t x, intmax_t y);
+
+
+
+/****************************************************/
+/* Null-Terminated byte String Functions            */
+/* Ref: https://en.cppreference.com/w/c/string/byte */
+/************************************************** */
+
+// TODO: Documentation, Converts a byte string to @ref int_max or @ref uintmax_t
+extern intmax_t strtoimax(const char* restrict nptr, char** restrict endptr, int base);
+extern uintmax_t strtoumax(const char* restrict nptr, char** restrict endptr, int base);
 
 #endif
 

@@ -20,9 +20,17 @@
 /* Program Support Functions                    */
 /* Ref: https://en.cppreference.com/w/c/program */
 /************************************************/
-// TODO: setjmp
-// TODO: longjmp
-// TODO: jmp_buf
+
+// TODO: Documentation, Execution context type
+typedef struct {} jmp_buf;
+// TODO: Define jmp_buf
+
+// TODO: Documentation, Saves the context
+#define setjmp(env) /* implementation defined */
+// TODO: Define setjmp
+
+// TODO: Documentation, Jumps to specified location
+extern void longjmp(jmp_buf env, int status) __attribute__((__noreturn__));
 
 #endif
 

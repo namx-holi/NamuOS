@@ -120,6 +120,7 @@
  * @see @ref I @copybrief I
 */
 #define _Imaginary_I /* unspecified */
+// TODO: Declare _Imaginary_I type if needed
 
 /** @brief The complex unit constant i
  * 
@@ -135,6 +136,7 @@
  * @see @ref I @copybrief I
 */
 #define _Complex_I /* unspecified */
+// TODO: Declare _Complex_I type if needed
 
 /** @brief The complex or imaginary unit constant i
  * 
@@ -166,6 +168,7 @@
  * for `operator""i`
 */
 #define I /* unspecified */
+// TODO: Declare I type if needed
 
 /** @brief Constructs a complex number from real and imaginary parts
  * 
@@ -222,29 +225,6 @@ extern double creal(double complex z);
 extern float crealf(float complex z);
 /// @copydoc creal(double complex z)
 extern long double creall(long double complex z);
-/** @brief Computes the real part of a complex number
- * 
- * Type-generic macro: if z has type `long double complex`, `long double
- * imaginary`, or `long double`, @ref creall is called. If z has type `float
- * complex`, `float imaginary`, or `float`, @ref crealf is called. If z has
- * type `double complex`, `double imaginary`, or `double`, or any integer type,
- * @ref creal is called.
- * 
- * @param z Complex argument
- * 
- * @returns The real part of z.
- * @returns This function is fully specified for all possible inputs and is not
- * subject to any errors described in @ref math_errhandling
- * 
- * @note For any complex variable z, `z == creal(z) + I*cimag(z)`.
- * 
- * @see @ref cimag @copybrief cimag
- * @see @ref cimagf @copybrief cimagf
- * @see @ref cimagl @copybrief cimagl
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex/real2)
- * for `real`
-*/
-#define creal( z )
 
 /** @brief Computes the imaginary part of a complex number
  * 
@@ -270,29 +250,6 @@ extern double cimag(double complex z);
 extern float cimagf(float complex z);
 /// @copydoc cimag(double complex z)
 extern long double cimagl(long double complex z);
-/** @copybrief cimag(double complex z)
- * 
- * Type-generic macro: if z has type `long double complex`, `long double
- * imaginary`, or `long double`, @ref cimagl is called. If z has type `float
- * complex`, `float imaginary`, or `float`, @ref cimagf is called. If z has type
- * `double complex`, `double imaginary`, `double`, or any integer type,
- * @ref cimag is called.
- * 
- * @param z Complex argument
- * 
- * @returns The imaginary part of z.
- * @returns This function is fully specified for all possible inputs and is not
- * subject to any errors described in @ref math_errhandling
- * 
- * @note for any complex variable z, `z == creal(z) + I*cimag(z)`.
- * 
- * @see @ref creal @copybrief creal
- * @see @ref crealf @copybrief crealf
- * @see @ref creall @copybrief creall
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex/imag2)
- * for `imag`
-*/
-#define cimag( z )
 
 /** @brief Computes the magnitude of a complex number
  * 
@@ -322,32 +279,6 @@ extern double cabs(double complex z);
 extern float cabsf(float complex z);
 /// @copydoc cabs(double complex z)
 extern long double cabsl(long double complex z);
-/** @copybrief cabs(double complex z)
- * 
- * Type-generic macro: if z has type `long double complex` or `long double
- * imaginary`, @ref cabsl is called. If z has type `float complex` or `float
- * imaginary`, @ref cabsf is called. If z has type `double complex` or `double
- * imaginary`, @ref cabs is called. For real and integer types, the
- * corresponding version of fabs is called.
- * 
- * @param z Complex argument
- * 
- * @returns If no errors occur, returns the absolute value (norm, magnitude) of
- * z.
- * @returns Errors and special cases are handled as if the function is
- * implemented as `hypot(creal(z), cimag(z))
- * 
- * @see @ref carg @copybrief carg
- * @see @link math.h::abs math.h abs @endlink Computes absolute value of an
- * integral value (\f$|x|\f$)
- * @see @link math.h::fabs math.h fabs @endlink Computes absolute value of a
- * floating-point value (\f$|x|\f$)
- * @see @link math.h::hypot math.h hypot @endlink Computes square root of the
- * sum of the squares of two given numbers (\f$\sqrt{x^2 + y^2}\f$)
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex/abs)
- * for `abs`
-*/
-#define fabs( z )
 
 /** @brief Computes the phase angle of a complex number
  * 
@@ -373,28 +304,6 @@ extern double carg(double complex z);
 extern float cargf(float complex z);
 /// @copydoc carg(double complex z)
 extern long double cargl(long double complex z);
-/** @copybrief carg(double complex z)
- * 
- * Type-generic macro: if z has type `long double complex`, `long double
- * imaginary`, or `long double`, @ref cargl is called. If z has type `float
- * complex`, `float imaginary`, or `float`, @ref cargf is called. If z has type
- * `double complex`, `double imaginary`, `double`, or any integer type,
- * @ref carg is called.
- * 
- * @param z Complex argument
- * 
- * @returns If no errors occur, returns the phase angle of z in the interval
- * \f$[-\pi; \pi]\f$.
- * @returns Errors and special cases are handled as if the function is
- * implemented as `atan2(cimag(z), creal(z))`
- * 
- * @see @ref cabs @copybrief cabs
- * @see @link math.h::atan2 math.h atan2 @endlink Computes arc tangent, using
- * signs to determine quadrants
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex/arg)
- * for `arg`
-*/
-#define carg(z)
 
 /** @brief Computes the complex conjugate
  * 
@@ -414,22 +323,6 @@ extern double complex conj(double complex z);
 extern float complex conjf(float complex z);
 /// @copydoc conj(double complex z)
 extern long double complex conjl(long double complex z);
-/** @copybrief conj(double complex z)
- * 
- * Type-generic macro: if z has type `long double complex`, `long double
- * imaginary`, or `long double`, @ref conjl is called. If z has type `float
- * complex`, `float imaginary`, or `float`, @ref conjf is called. If z has type
- * `double complex`, `double imaginary`, `double` or any integer type,
- * @ref conj is called.
- * 
- * @param z Complex argument
- * 
- * @returns The complex conjugate of z.
- * 
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex/conj)
- * for `conj`
-*/
-#define conj( z )
 
 /** @brief Computes the projection on Riemann sphere
  * 
@@ -460,40 +353,86 @@ double complex cproj(double complex z);
 float complex cprojf(float complex z);
 /// @copydoc cproj(double complex z)
 long double complex cprojl(long double complex z);
-/** @copybrief cproj(double complex z)
- * 
- * Type-generic macro: if z has type `long double complex`, `long double
- * imaginary`, or `long double`, @ref cprojl is called. If z has type `float
- * complex`, `float imaginary`, or `float`, @ref cprojf is called. If z has type
- * `double complex`, `double imaginary`, `double` or any integer type,
- * @ref cproj is called.
- * 
- * @note The `cproj` function helps model the Riemann sphere by mapping all
- * infinities to one (give or take the sign of the imaginary zero), and should
- * be used just before any operation, especially comparisons, that might give
- * spurious results for any of the other infinities.
- * 
- * @see [C++ documentation](https://en.cppreference.com/w/cpp/numeric/complex/proj)
- * for `proj`
-*/
-#define cproj( z )
 
-// TODO: cexp, computes the complex base-e exponential
-// TODO: clog, computes the complex natural logarithm
-// TODO: cpow, computes the complex power function
-// TODO: csqrt, computes the complex square root
-// TODO: csin, computes the complex sine
-// TODO: ccos, computes the complex cosine
-// TODO: ctan, computes the complex tangent
-// TODO: casin, computes the complex arc sine
-// TODO: cacos, computes the complex arc cosine
-// TODO: catan, computes the complex arc tangent
-// TODO: csinh, computes the complex hyperbolic sine
-// TODO: ccosh, computes the complex hyperbolic cosine
-// TODO: ctanh, computes the complex hyperbolic tangent
-// TODO: casinh, computes the complex arc hyperbolic sine
-// TODO: cacosh, computes the complex arc hyperbolic cosine
-// TODO: catanh, computes the complex arc hyperbolic tangent
+// TODO: Documentation, Computes the complex base-e exponential
+extern double complex cexp(double complex z);
+extern float complex cexpf(float complex z);
+extern long double complex cexpl(long double complex z);
+
+// TODO: Documentation, Computes the complex natural logarithm
+extern double complex clog(double complex z);
+extern float complex clogf(float complex z);
+extern long double complex clongl(long double complex z);
+
+// TOOD: Documentation, Computes the complex power function
+extern double complex cpow(double complex x, double complex y);
+extern float complex cpowf(float complex x, float complex y);
+extern long double complex cpowl(long double complex x, long double complex y);
+
+// TODO: Documentation, Computes the complex square root
+extern double complex csqrt(double complex z);
+extern float complex csqrtf(float complex z);
+extern long double complex csqrtl(long double complex z);
+
+// TODO: Documentation, Computes the complex sine
+extern double complex csin(double complex z);
+extern float complex csinf(float complex z);
+extern long double complex csinl(long double complex z);
+
+// TODO: Documentation, Computes the complex cosine
+extern double complex ccos(double complex z);
+extern float complex ccosf(float complex z);
+extern long double complex ccosl(long double complex z);
+
+// TODO: Documentation, Computes the complex tangent
+extern double complex ctan(double complex z);
+extern float complex ctanf(float complex z);
+extern long double complex ctanl(long double complex z);
+
+// TODO: Documentation, Computes the complex arc sine
+extern double complex casin(double complex z);
+extern float complex casinf(float complex z);
+extern long double complex casinl(long double complex z);
+
+// TODO: Documentation, Computes the complex arc cosine
+extern double complex cacos(double complex z);
+extern float complex cacosf(float complex z);
+extern long double complex cacosl(long double complex z);
+
+// TODO: Documentation, Computes the complex arc tangent
+extern double complex catan(double complex z);
+extern float complex catanf(float complex z);
+extern long double complex catanl(long double complex z);
+
+// TODO: Documentation, Computes the complex hyperbolic sine
+extern double complex csinh(double complex z);
+extern float complex csinhf(float complex z);
+extern long double complex csinhl(long double complex z);
+
+// TODO: Documentation, Computes the complex hyperblic cosine
+extern double complex ccosh(double complex z);
+extern float complex ccoshf(float complex z);
+extern long double complex ccoshl(long double complex z);
+
+// TODO: Documentation, Computes the complex hyperbolic tangent
+extern double complex ctanh(double complex z);
+extern float complex ctanhf(float complex z);
+extern long double complex ctanhl(long double complex z);
+
+// TODO: Documentation, Computes the complex arc hyperbolic sine
+extern double complex casinh(double complex z);
+extern float complex casinhf(float complex z);
+extern long double complex casinhl(long double complex z);
+
+// TODO: Documentation, Computes the complex arc hyperbolic cosine
+extern double complex cacosh(double complex z);
+extern float complex cacoshf(float complex z);
+extern long double complex cacoshl(long double complex z);
+
+// TODO: Documentation, Computes the complex arc hyperbolic tangent
+extern double complex catanh(double complex z);
+extern float complex catanhf(float complex z);
+extern long double complex catanhl(long double complex z);
 
 #endif /* Complex numbers enabled */
 

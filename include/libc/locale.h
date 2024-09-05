@@ -187,12 +187,12 @@ struct lconv* localeconv(void);
  * @{
  */
 // TODO: Implement locale categories
-#define LC_ALL 1 ///< Selects the entire C locale
-#define LC_COLLATE 2 ///< Selects the collation category of the C locale
-#define LC_CTYPE 3 ///< Selects the character classification category of the C locale
-#define LC_MONETARY 4 ///< Selects the monetary formatting category of the C locale
-#define LC_NUMERIC 5 ///< Selects the numeric formatting category of the C locale
-#define LC_TIME 6 ///< Selects the time formatting category of the C locale
+#define LC_ALL 1 /**< Selects the entire C locale */
+#define LC_COLLATE 2 /**< Selects the collation category of the C locale */
+#define LC_CTYPE 3 /**< Selects the character classification category of the C locale */
+#define LC_MONETARY 4 /**< Selects the monetary formatting category of the C locale */
+#define LC_NUMERIC 5 /**< Selects the numeric formatting category of the C locale */
+#define LC_TIME 6 /**< Selects the time formatting category of the C locale */
 /** @} */
 
 #endif

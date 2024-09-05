@@ -284,22 +284,32 @@ extern errno_t getenv_s(size_t* restrict len, char* restrict value, rsize_t valu
 /* Null-Terminated Byte Functions                   */
 /* Ref: https://en.cppreference.com/w/c/string/byte */
 /****************************************************/
-// TODO: atof
-// TODO: atoi
-// TODO: atol
-// TODO: atoll
-// TODO: strtol
-// TODO: strtoll
-// TODO: strtoul
-// TODO: strtoull
-// TODO: strtof
-// TODO: strtod
-// TODO: strtold
-// TODO: strfromf
-// TODO: strfromd
-// TODO: strfroml
-// TODO: strtoimax
-// TODO: strtoumax
+
+// TODO: Documentation, Converts a byte string to a floating-point value
+extern double atof(const char* str);
+
+// TODO: Documentation, Converts a byte string to an integer value
+extern int atoi(const char* str);
+extern long atol(const char* str);
+extern long long atoll(const char* str);
+
+// TODO: Documentation, Converts a byte string to an integer value
+extern long strtol(const char* restrict str, char** restrict str_end, int base);
+extern long long strtoll(const char* restrict str, char** restrict str_end, int base);
+
+// TODO: Documentation, Converts a byte string to an unsigned integer value
+extern unsigned long strtoul(const char* restrict str, char** restrict str_end, int base);
+extern unsigned long long strtoull(const char* restrict str, char** restrict str_end, int base);
+
+// TODO: Documentation, Converts a byte string to a floating-point value
+extern float strtof(const char* restrict str, char** restrict str_end);
+extern double strtod(const char* restrict str, char** restrict str_end);
+extern long double strtold(const char* restrict str, char** restrict str_end);
+
+// TODO: Documentation, Converts a floating-point value to a byte string
+extern int strfromf(char* restrict s, size_t n, const char* restrict format, float fp);
+extern int strfromd(char* restrict s, size_t n, const char* restrict format, double fp);
+extern int strfroml(char* restrict s, size_t n, const char* restrict format, long double fp);
 
 
 /*********************************************************/

@@ -19,6 +19,10 @@
 #include <stddef.h> // size_t
 #include <stdarg.h> // va_list
 
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+#include <errno.h> // errno_t
+#endif
+
 
 /*******************************************/
 /* File Input/Output Functions             */
@@ -69,22 +73,141 @@
 */
 typedef struct {} FILE; // TODO: Implement
 
-// TODO: fpos_t
-// TODO: stdin, stdout, stderr
-// TODO: fopen, fopen_s
-// TODO: freopen, freopen_s
-// TODO: fclose
-// TODO: fflush
-// TODO: setbuf
-// TODO: setvbuf
-// TODO: fread
-// TODO: fwrite
-// TODO: fgetc, getc
-// TODO: fgets
-// TODO: fputc, putc
-// TODO: fputs
-// TODO: getchar
-// TODO: gets_s
+/** @brief Non-array complete object type, capable of uniquely specifying a position and multibyte parser state in a file
+ * 
+ * `fpos_t` is a non-array complete object type, can be used to store (by
+ * @ref fgetpos) and restore (by @ref fsetpos) the position and multibyte parser
+ * state (if any) for a C stream.
+ * 
+ * The multibyte parser state of a wide-oriented C stream is represented by a
+ * @ref mbstate_t object, whose value is stored as part of the value of a
+ * `fpos_t` object by @ref fgetpos.
+ * 
+ * @see @ref fgetpos @copybrief fgetpos
+ * @see @ref fsetpos @copybrief fsetpos
+ * @see @ref mbstate_t @copybrief mbstate_t
+*/
+typedef struct {} fpos_t; // TODO: Implement
+
+/** @brief Expression of type `FILE*` associated with the input stream
+ * 
+ * Associated with the *standard input stream*, used for reading conventional
+ * input. At program startup, the stream is fully buffered if and only if the
+ * stream can be determined to not refer to an interactive device.
+ * 
+ * What constitutes an interactive device is implementation-defined.
+ * 
+ * These macros are expanded to expressions of type `FILE*`.
+ * 
+ * @note Although not mandated by POSIX, the UNIX convention is that `stdin` and
+ * @ref stdout are line-buffered if associated with a terminal and @ref stderr
+ * is unbuffered.
+ * @note These macros may be expanded to modifiable lvalues. If any of these
+ * `FILE*` lvalue is modified, subsequent operations on the corresponding stream
+ * result in unspecified or undefined behaviour.
+ * 
+ * @see @ref FILE @copybrief FILE
+*/
+#define stdin /* implementation defined */
+// TODO: Implement
+
+/** @brief Expression of type `FILE*` associated with the output stream
+ * 
+ * Associated with the *standard output stream*, used for writing conventional
+ * output. At program startup, the stream is fully buffered if and only if the
+ * stream can be determined to not refer to an interactive device.
+ * 
+ * What constitutes an interactive device is implementation-defined.
+ * 
+ * These macros are expanded to expressions of type `FILE*`.
+ * 
+ * @note Although not mandated by POSIX, the UNIX convention is that `stdin` and
+ * @ref stdout are line-buffered if associated with a terminal and @ref stderr
+ * is unbuffered.
+ * @note These macros may be expanded to modifiable lvalues. If any of these
+ * `FILE*` lvalue is modified, subsequent operations on the corresponding stream
+ * result in unspecified or undefined behaviour.
+ * 
+ * @see @ref FILE @copybrief FILE
+*/
+#define stdout /* implementation defined */
+// TODO: Implement
+
+/** @brief Expression of type `FILE*` associated with the error output stream
+ * 
+ * Associated with the *standard error stream*, used for writing diagnostic
+ * output. At program startup, the stream is not fully buffered.
+ * 
+ * What constitutes an interactive device is implementation-defined.
+ * 
+ * These macros are expanded to expressions of type `FILE*`.
+ * 
+ * @note Although not mandated by POSIX, the UNIX convention is that `stdin` and
+ * @ref stdout are line-buffered if associated with a terminal and @ref stderr
+ * is unbuffered.
+ * @note These macros may be expanded to modifiable lvalues. If any of these
+ * `FILE*` lvalue is modified, subsequent operations on the corresponding stream
+ * result in unspecified or undefined behaviour.
+ * 
+ * @see @ref FILE @copybrief FILE
+*/
+#define stderr /* implementation defined */
+// TODO: Implement
+
+// TODO: Documentation, Opens a file
+extern FILE* fopen(const char* restrict filename, const char* restrict mode);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation
+extern errno_t fopen_s(FILE* restrict *restrict streamptr, const char* restrict filename, const char* restrict mode);
+#endif
+
+// TODO: Documentation, Opens an existing stream with a different name
+extern FILE* freopen(const char* restrict filename, const char* restrict mode, FILE* restrict stream);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation
+extern errno_t freopen_s(FILE* restrict *restrict newstreamptr, const char* restrict filename, const char* restrict mode, FILE* restrict stream);
+#endif
+
+// TODO: Documentation, Closes a file
+extern int fclose(FILE* stream);
+
+// TODO: Documentation, Synchronises an output stream with the actual file
+extern int fflush(FILE* stream);
+
+// TODO: Documentation, Sets the buffer for a file stream
+extern void setbuf(FILE* restrict stream, char* restrict buffer);
+
+// TODO: Documentation, Sets the buffer and its size for a file stream
+extern int setvbuf(FILE* restrict stream, char* restrict buffer, int mode, size_t size);
+
+// TODO: Documentation, Reads from a file
+extern size_t fread(void* restrict buffer, size_t size, size_t count, FILE* restrict stream);
+
+// TODO: Documentation, Writes to a file
+extern size_t fwrite(const void* restrict buffer, size_t size, size_t count, FILE* restrict stream);
+
+// TODO: Documentation, Gets a character from a file stream
+extern int fgetc(FILE* stream);
+extern int getc(FILE* stream);
+
+// TODO: Documentation, Gets a character string from a file stream
+extern char* fgets(char* restrict str, int count, FILE* restrict stream);
+
+// TODO: Documentation, Writes a character to a file stream
+extern int fputc(int ch, FILE* stream);
+extern int putc(int ch, FILE* stream);
+
+// TODO: Documentation, Writes a character string to a file stream
+extern int fputs(const char* restrict str, FILE* restrict stream);
+
+// TODO: Documentation, Reads a character from @ref stdin
+extern int getchar(void);
+
+// TODO: Documentation, Reads a character string from @ref stdin
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+char* gets_s(char* str, rsize_t n);
+#endif
+// NOTE: gets removed in C11
 
 /** @brief Writes a character string from @ref stdin
  * 
@@ -129,11 +252,30 @@ extern int putchar(int ch);
  * @see fputs @copybrief fputs
  * @see printf and it's variants, @copybrief printf
 */
-int puts(const char* str);
+extern int puts(const char* str);
 
-// TODO: ungetc
-// TODO: scanf, fscanf, sscanf, scanf_s, fscanf_s, sscanf_s
-// TODO: vscanf, vfscanf, vsscanf, vscanf_s, vfscanf_s, vsscanf_s
+// TODO: Documentation, Puts a character back into a file stream
+extern int ungetc(int ch, FILE* stream);
+
+// TODO: Documentation, Reads formatted inoput from @ref stdin, a file stream or a buffer
+extern int scanf(const char* restrict format, ...);
+extern int fscanf(FILE* restrict stream, const char* restrict format, ...);
+extern int sscanf(const char* restrict buffer, const char* restrict format, ...);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+extern int scanf_s(const char* restrict format, ...);
+extern int fscanf_s(FILE* restrict stream, const char* restrict format, ...);
+extern int sscanf_(const char* restrict buffer, const char* restrict format, ...);
+#endif
+
+// TODO: Documentation, Reads formatted input from @ref stdin, a file stream or a buffer using variable argument list
+extern int vscanf(const char* restrict format, va_list vlist);
+extern int vfscanf(FILE* restrict stream, const char* restrict format, va_list vlist);
+extern int vsscanf(const char* restrict buffer, const char* restrict format, va_list vlist);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+extern int vscanf_s(const char* restrict format, va_list vlist);
+extern int vfscanf_s(FILE* restrict stream, const char* restrict format, va_list vlist);
+extern int vsscanf_s(const char* restrict buffer, const char* restrict format, va_list vlist);
+#endif
 
 /** @brief Prints formatted output to @ref stdout, a file stream or a buffer
  * 
@@ -190,19 +332,50 @@ extern int vfprintf_s(FILE* restrict stream, const char* restrict format, va_lis
 // extern int vsnprintf_s(char* restrict buffer, rsize_t bufsz, const char* restrict format, va_list vlist);
 #endif
 
-// TODO: ftell
-// TODO: fgetpos
-// TODO: fseek
-// TODO: fsetpos
-// TODO: rewind
-// TODO: clearerr
-// TODO: feof
-// TODO: ferror
-// TODO: perror
-// TODO: remove
-// TODO: rename
-// TODO: tmpfile, tmpfile_s
-// TODO: tmpnam, tmpnam_s
+// TODO: Documentation, Returns the current file position indicator
+extern long ftell(FILE* stream);
+
+// TODO: Documentation, Gets the file position indicator
+extern int fgetpos(FILE* restrict stream, fpos_t* restrict pos);
+
+// TODO: Documentation, Moves the file position indicator to a specific location in a file
+extern int fseek(FILE* stream, long offset, int origin);
+
+// TODO: Documentation, Moves the file position indicator to a specific location in a file
+extern int fsetpos(FILE* stream, const fpos_t* pos);
+
+// TODO: Documentation, Moves the file position indicator to the beginning in a file
+extern void rewind(FILE* stream);
+
+// TODO: Documentation, Clears errors
+extern void clearerr(FILE* stream);
+
+// TODO: Documentation, Checks for the end-of-file
+extern int feof(FILE* stream);
+
+// TODO: Documentation, Checks for a file error
+extern int ferror(FILE* stream);
+
+// TODO: Documentation, Displays a character string corresponding of the current error to @ref stderr
+extern void perror(const char* s);
+
+// TODO: Documentation, Erases a file
+extern int remove(const char* pathname);
+
+// TODO: Documentation, Renames a file
+extern int rename(const char* old_filename, const char* new_filename);
+
+// TODO: Documentation, Returns a pointer to a temporary file
+extern FILE* tmpfile(void);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+extern errno_t tmpfile_s(FILE* restrict* restrict streamptr);
+#endif
+
+// TODO: Documentation, Returns a unique filename
+extern char* tmpname(char* filename);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+extern errno_t tmpnam_s(char* filename_s, rsize_t maxsize);
+#endif
 
 #endif
 
