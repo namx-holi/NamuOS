@@ -23,13 +23,126 @@
 /* Null-Terminated Byte Functions                   */
 /* Ref: https://en.cppreference.com/w/c/string/byte */
 /****************************************************/
-// TODO: strcpy, strcpy_s
-// TODO: strncpy, strncpy_s
-// TODO: strcat, strcat_s
-// TODO: strncat, strncat_s
-// TODO: strxfrm
-// TODO: strdup
-// TODO: strndup
+
+// TODO: Documentation, Copies one string to another
+extern char* strcpy(char* restrict dest, const char* restrict src);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation for strcpy_s
+extern errno_t strcpy_s(char* restrict dest, rsize_t destsz, const char* restrict src);
+#endif
+
+// TODO: Documentation, Copies a certain amount of characters from one string to another
+extern char* strncpy(char* restrict dest, const char* restrict src, size_t count);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation for strncpy_s
+extern errno_t strncpy_s(char* restrict dest, rsiz_t destsz, const char* restrict src, rsize_t count);
+#endif
+
+// TODO: Documentation, Concatenates two strings
+extern char* strcat(char* restrict dest, const char* restrict src);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation for strcat_s
+extern errno_t strcat_s(char* restrict dest, rsize_t destsz, const char* restrict src);
+#endif
+
+// TODO: Documentation, Concatenates a certain amount of characters of two strings
+extern char* strncat(char* restrict dest, const char* restrict src, size_t count);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation for strncat_s
+extern errno_t strncat_s(char* restrict dest, rsize_t destsz, const char* restrict src, rsize_t count);
+#endif
+
+/** @brief Transform a string so that @ref strcmp would produce the same result as @ref strcoll
+ * 
+ * Transforms the null-terminated byte string pointed to by `src` into the
+ * implementation-defined form such that comparing two transformed strings with
+ * @ref strcmp gives the same result as comparing the original strings with
+ * @ref strcoll, in the current C locale.
+ * 
+ * The first `count` characters of the transformed string are written to `dest`,
+ * including the terminating null character, and the length of the first
+ * transformed string is returned, excluding the terminating null character.
+ * 
+ * The behaviour is undefined if the `dest` array is not large enough. The
+ * behaviour is undefined if `dest` and `src` overlap.
+ * 
+ * If `count` is `0`, then `dest` is allowed to be a null pointer.
+ * 
+ * @param dest Pointer to the first element of the array where the transformed
+ * string will be written
+ * @param src Pointer to the first character of a null-terminated byte string to
+ * transform
+ * @param count Maximum number of characters to be written
+ * 
+ * @returns The length of the transformed string, not including the terminating
+ * null-character.
+ * 
+ * @note The correct length of the buffer that can receive the entire
+ * transformed string is `1 + strxfrm(NULL, src, 0)`.
+ * @note This function is used when making multiple locale-dependent comparisons
+ * using the same string or set of strings, because it is more efficient to use
+ * @ref strxfrm to transform all the strings just once, and subsequently compare
+ * the transformed strings with @ref strcmp.
+ * 
+ * @see @ref strcoll @copybrief strcoll
+ * @see @ref wcscoll @copybrief wcscoll
+ * @see @ref strcmp @copybrief strcmp
+ * @see @ref wcsxfrm @copybrief wcsxfrm
+*/
+extern size_t strxfrm(char* restrict dest, const char* restrict src, size_t count);
+
+/** @brief Allocates a copy of a string
+ * 
+ * Returns a pointer to a null-terminated byte string, which is a duplicate of
+ * the string pointed to by `src`. The space for the new string is obtained as
+ * if @ref malloc was invoked. The returned pointer must be passed to @ref free
+ * to avoid a memory leak.
+ * 
+ * If an error occurs, a null pointer is returned and @ref errno might be set.
+ * 
+ * @param src Pointer to the null-terminated byte string to duplicate
+ * 
+ * @returns A pointer to the newly allocating string, or a null pointer if an
+ * error occured.
+ * 
+ * @note The function is identical to the POSIX function
+ * [strdup](http://pubs.opengroup.org/onlinepubs/9699919799/functions/strdup.html).
+ * 
+ * @see @ref strndup @copybrief strndup
+ * @see @ref strcpy and @ref strcpy_s, @copybrief strcpy
+ * @see @ref malloc @copybrief malloc
+ * @see @ref free @copybrief free
+*/
+extern char* strdup(const char* src);
+
+/** @brief Allocates a copy of a string of specified size
+ * 
+ * Returns a pointer to a null-terminated byte string, which contains copies of
+ * at most `size` bytes from the string pointed to by `src`. The space for the
+ * new string is obtained as if @ref malloc was called. If the null terminator
+ * is not encountered in the first `size` bytes, it is appended to the
+ * duplicated string.
+ * 
+ * The returned pointer must be passed to @ref free to avoid a memory leak.
+ * 
+ * If an error occurs, a null pointer is returned and @ref errno might be set.
+ * 
+ * @param src Pointer to the null-terminated byte string to duplicate
+ * @param size Max number of bytes to copy from src
+ * 
+ * @returns A pointer to the newly allocated string, or a null pointer if an
+ * error occured.
+ * 
+ * @note The function is identical to the POSIX function
+ * [strndup](http://pubs.opengroup.org/onlinepubs/9699919799/functions/strdup.html)
+ * except that is allowed, but not required to set @ref errno on error.
+ * 
+ * @see @ref strdup @copybrief strdup
+ * @see @ref strcpy and @ref strcpy_s, @copybrief strcpy
+ * @see @ref malloc @copybrief malloc
+ * @see @ref free @copybrief free
+*/
+extern char* strndup(const char* src, size_t size);
 
 /** @brief Returns the length of a given string
  * 
@@ -74,16 +187,43 @@ extern size_t strlen(const char* str);
 extern size_t strnlen_s(const char* str, size_t strsz);
 #endif
 
-// TODO: strcmp
-// TODO: strncmp
-// TODO: strcoll
-// TODO: strchr
-// TODO: strrchr
-// TODO: strspn
-// TODO: strcpsn
-// TODO: strpbrk
-// TODO: strstr
-// TODO: strtok, strtok_s
+// TODO: Documentation, Compares two strings
+extern int strcmp(const char* lhs, const char* rhs);
+
+// TODO: Documentation, Compares a certain amount of characters of two strings
+extern int strncmp(const char* lhs, const char* rhs, size_t count);
+
+// TODO: Documentation, Compares two strings in accordance to the current locale
+extern int strcoll(const char* lhs, const char* rhs);
+
+// TODO: Documentation, Finds the first occurrence of a character
+extern char* strchr(const char* str, int ch);
+// TODO: QChar version
+
+// TODO: Documentation, Finds the last occurrence of a character
+extern char* strrchr(const char* str, int ch);
+// TODO: QChar version
+
+// TODO: Documentation, Returns the length of the maximum initial segment that consists of only the characters found in another byte string
+extern size_t strspn(const char* dest, const char* src);
+
+// TODO: Documentation, Returns the length of the maximum initial segment that consists of only the characters not found in another byte string
+extern size_t strcspn(const char* dest, const char* src);
+
+// TODO: Documentation, Finds the first location of any character in one string, in another string
+extern char* strpbrk(const char* dest, const char* breakset);
+// TODO: QChar version
+
+// TODO: Documentation, Finds the first occurrence of a substring of characters
+extern char* strstr(const char* str, const char* substr);
+// TODO: QChar version
+
+// TODO: Documentation, Finds the next token in a byte string
+extern char* strtok(char* restrict str, const char* restrict delim);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Document strtok_s
+extern char* strtok_s(char* restrict str, rsize_t *restrict strmax, const char* restrict delim, char** restrict ptr);
+#endif
 
 /** @brief Searches an array for the first occurrence of a character
  * 
@@ -362,7 +502,15 @@ extern errno_t memmove_s(void* dest, rsize_t destsz, const void* src, rsize_t co
 */
 extern void* memccpy(void* restrict dest, const void* restrict src, int c, size_t count);
 
-// TODO: strerror, strerror_s, strerrorlen_s
+// TODO: Documentation, Returns a text version of a given error code
+extern char* strerror(int errnum);
+#ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+// TODO: Documentation for strerror_s
+extern errno_t strerror_s(char* buf, rsize_t bufsz, errno_t errnum);
+
+// TODO: Documentation for strerrorlen_s
+extern size_t strerrorlen_s(errno_t errnum);
+#endif
 
 #endif
 
