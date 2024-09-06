@@ -14,6 +14,7 @@
 
 // NOTE: Assuming PS/2
 // TODO: Prefix addresses with appropriate type based on type
+// TODO: Update addresses to match new page table mapping.
 
 // Ref: https://stanislavs.org/helppc/bios_data_area.html
 #define BDA_INTERRUPT_VECTOR_TABLE ((uint16_t*)0x0000) // 256dwords
@@ -30,7 +31,7 @@
 #define BDA_EBDA_SEGMENT ((uint16_t*)0x040e) // word
 
 // Ref: https://stanislavs.org/helppc/int_11.html
-#define BDA_EQUIPMENT_LIST_FLAGS ((uint16_t*)0x0410) // 2 bytes
+#define BDA_EQUIPMENT_LIST_FLAGS ((uint16_t*)0xc0000410) // 2 bytes
     #define BDA_EQUIPT_IPL_MASK 0x0001
     #define BDA_EQUIPT_IPL_SHIFT 0
     #define BDA_EQUIPT_MATH_COPROCESSOR_MASK 0x0002
@@ -153,12 +154,19 @@
 
 // TODO: Continue from base port address for active 6845 CRT controller
 
+// NOTE: This is what the addresses look like before using a higher half kernel
+// #define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xb0000)
+// #define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xb8000)
 
+// NOTE: This is what the addresses look like when only mapping kernel in page
+//  table in higher half kernel, specifically using page 1024 for video
+// #define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xC03F7000)
+// #define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xC03FF000)
 
-
-
-#define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xb0000)
-#define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xb8000)
+// NOTE: This is what the addresses look like when fully mapping the first 1 MiB
+//  in the page table, not specifically looking for VGA.
+#define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xc00b0000)
+#define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xc00b8000)
 
 
 
