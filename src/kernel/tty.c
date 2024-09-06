@@ -1,3 +1,5 @@
+/// @file tty.c
+
 #include <kernel/tty.h> // Implements
 
 #include <stdbool.h> // bool
@@ -44,8 +46,7 @@ void terminal_bounds_check() {
 
 void terminal_initialise(void) {
     // First fetch the detected equipment flags from BIOS (2 bytes)
-    const uint16_t* bios_hardware_ptr = BDA_EQUIPMENT_LIST_FLAGS;
-    uint16_t detected_hardware = *bios_hardware_ptr;
+    uint16_t detected_hardware = *BDA_EQUIPMENT_LIST_FLAGS;
 
     // Check what video mode is being used by the monitor
     enum video_mode vmode = (enum video_mode)(

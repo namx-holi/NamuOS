@@ -7,13 +7,17 @@
  * @todo Detailed description
  * 
  * @{
- */
+*/
 
 #ifndef _KERNEL_TTY_H
 #define _KERNEL_TTY_H 1
 
 #include <stdint.h> // uint8_t, uint16_t
 #include <stddef.h> // size_t
+
+
+// TODO: Method to print to certain page
+// TODO: Method to enable page
 
 
 #define TTY_TAB_WIDTH 4
@@ -34,6 +38,7 @@ enum video_mode {
 };
 
 // TODO: Document
+// Ref: https://wiki.osdev.org/Printing_To_Screen#Color_Table
 enum vga_colour {
 	VGA_COLOUR_BLACK = 0,
 	VGA_COLOUR_BLUE = 1,
