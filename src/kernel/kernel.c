@@ -30,6 +30,21 @@
 void kernel_main(void) {
 	terminal_initialise();
 
+	// // Testing fetching BIOS info
+	// uint16_t e = fetch_bios_area_data(BDA_DETECTED_HARDWARE);
+	// printf("IPL diskette installed? %d\n", (e & 0x0001) >> 0);
+	// printf("Math coprocessor? %d\n", (e & 0x0002) >> 1);
+	// printf("Pointing device installed (PS/2)? %d\n", (e & 0x0004) >> 2);
+	// printf("Not used on PS/2? %d\n", (e & 0x0008) >> 3);
+	// printf("Initial video mode? %d\n", (e & 0x0030) >> 4);
+	// printf("# of diskette drives, less 1: %d\n", (e & 0x00c0) >> 6);
+	// printf("0 if DMA installed: %d\n", (e & 0x0100) >> 8);
+	// printf("Number of serial ports: %d\n", (e & 0x0e00) >> 9);
+	// printf("Game adapter? %d\n", (e & 0x1000) >> 12);
+	// printf("Internal modem (PS/2)? %d\n", (e & 0x2000) >> 13);
+	// printf("Number of printer ports: %d\n", (e & 0xc000) >> 14);
+	// printf("\n");
+
 	// Testing printing
 	printf("Hello, kernel world!\n");
 	printf("Printing number 1234 using format: %d\n", 1234);

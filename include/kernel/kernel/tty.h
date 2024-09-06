@@ -7,95 +7,76 @@
  * @todo Detailed description
  * 
  * @{
-*/
+ */
 
 #ifndef _KERNEL_TTY_H
 #define _KERNEL_TTY_H 1
 
+#include <stdint.h> // uint8_t, uint16_t
 #include <stddef.h> // size_t
-#include <stdint.h> // uint8_t
 
 
-/** @brief Sets up terminal interface, and clears screen
- * 
- * Sets up the pointer @ref terminal_buffer to point to where VGA data needs to
- * be written for displaying characters on the terminal. Also sets the default
- * printing colour, and clears the screen.
-*/
+#define TTY_TAB_WIDTH 4
+
+// TODO: Document
+typedef uint8_t vga_colour_t;
+typedef uint16_t vga_entry_t;
+
+
+// TODO: Document
+// Used to identify if colour or monochrome video card is being used
+// Ref: https://wiki.osdev.org/Detecting_Colour_and_Monochrome_Monitors
+enum video_mode {
+	VIDEO_MODE_UNUSED = 0,
+	VIDEO_MODE_40x25_COLOUR = 1,
+	VIDEO_MODE_80x25_COLOUR = 2,
+	VIDEO_MODE_80x25_MONOCHROME = 3
+};
+
+// TODO: Document
+enum vga_colour {
+	VGA_COLOUR_BLACK = 0,
+	VGA_COLOUR_BLUE = 1,
+	VGA_COLOUR_GREEN = 2,
+	VGA_COLOUR_CYAN = 3,
+	VGA_COLOUR_RED = 4,
+	VGA_COLOUR_MAGENTA = 5,
+	VGA_COLOUR_BROWN = 6,
+	VGA_COLOUR_LIGHT_GREY = 7,
+	VGA_COLOUR_DARK_GREY = 8,
+	VGA_COLOUR_LIGHT_BLUE = 9,
+	VGA_COLOUR_LIGHT_GREEN = 10,
+	VGA_COLOUR_LIGHT_CYAN = 11,
+	VGA_COLOUR_LIGHT_RED = 12,
+	VGA_COLOUR_LIGHT_MAGENTA = 13,
+	VGA_COLOUR_LIGHT_BROWN = 14,
+	VGA_COLOUR_WHITE = 15,
+};
+
+
+// TODO: Document
 void terminal_initialise(void);
 
-/** @brief Sets the current colour scheme of the terminal
- * 
- * Sets the colour for printing characters to the terminal. A colour is
- * characterised as 4 bits representing the background colour, followed by 4
- * bits representing the colour of the character. THe colours available are
- * outlined in @ref vga_colour, and a colour can be constructed using the
- * @ref vga_entry_colour method.
- * 
- * @param colour New colour scheme of the terminal
-*/
-void terminal_setcolour(uint8_t colour);
+// TODO: Document
+void terminal_setcolour(vga_colour_t colour);
 
-/** @brief Writes a character of given colour at given position on the terminal
- * 
- * Writes a character `ch` to the terminal in the given `colour` and position.
- * No checks are made for if the given character is printable or not.
- * 
- * @param ch Character to write to terminal
- * @param colour Colour of the character to print
- * @param x Column of where to print the character
- * @param y Row of where to print the character
-*/
-void terminal_putentryat(unsigned char ch, uint8_t colour, size_t x, size_t y);
+// TODO: Document
+void terminal_putentryat(unsigned char ch, vga_colour_t colour, size_t x, size_t y);
 
-/** @brief Writes a character to the terminal
- * 
- * Writes a character after the last written character using this method,
- * @ref terminal_write, or @ref terminal_writestring. Printing is bounds checked
- * against the size of the terminal, and if a character would go off the screen
- * in its row, it is moved to the next column.
- * 
- * Some whitespace characters (e.g. <tt>'\\n'</tt>) adjust the current printing
- * position.
- * 
- * The position of the last written character is updated after writing.
- * 
- * @param ch Character to write to terminal
-*/
+// TODO: Document
 void terminal_putchar(char ch);
 
-/** @brief Writes a character array to the terminal
- * 
- * Writes an array of size `size` after the last written character using
- * @ref terminal_putchar, this method, or @ref terminal_writestring. Printing
- * is bounds checked against the size of the terminal, and if a character would
- * go off the screen in its row, it is moved to the next column.
- * 
- * Some whitespace characters (e.g. <tt>'\\n'</tt>) adjust the current printing
- * position.
- * 
- * The position of the last written character is updated after writing.
- * 
- * @param data Array of characters to write to terminal
- * @param size Number of characters to write from `array`
-*/
+// TODO: Document
 void terminal_write(const char* data, size_t size);
 
-/** @brief Writes a null-terminated string to the terminal
- * 
- * Writes a null-terminated C string after the last written character using
- * @ref terminal_putchar, @ref terminal_write, or this method. Printing is
- * bounds checked against the size of the terminal, and if a character would go
- * off the screen in its row, it is moved to the next column.
- * 
- * Some whitespace characters (e.g. <tt>'\\n'</tt>) adjust the current printing
- * position.
- * 
- * The position of the last written character is updated after writing.
- * 
- * @param str Null-terminated C string to write to terminal
-*/
+// TODO: Document
 void terminal_writestring(const char* str);
+
+// TODO: Document
+vga_colour_t vga_colour_pair(enum vga_colour fg, enum vga_colour bg);
+
+// TODO: Document
+vga_entry_t vga_entry(unsigned char ch, vga_colour_t colour);
 
 #endif
 
