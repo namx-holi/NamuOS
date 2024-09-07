@@ -1,3 +1,5 @@
+# TODO: Set up similar to https://github.com/cstack/osdev/blob/master/loader.s
+
 # Declare constants for the multiboot header.
 .set ALIGN,    1<<0             # align loaded modules on page boundaries
 .set MEMINFO,  1<<1             # provide memory map
@@ -117,6 +119,13 @@ _start:
 
 	# Set up the stack
 	mov $stack_top, %esp
+
+	# GRUB gives some data after setup in EAX and EBX, containing the multiboot
+	#  magic number and address to a multiboot_info_t struct respectively. Add
+	#  these onto the stack so we can access them as arguments to kernel_main.
+	push %eax # Magic number as second argument
+	addl $0xC0000000, %ebx # Add offset to address so it's accessible
+	push %ebx # multiboot_info_t address as first argument
 
 	# Enter the high-level kernel
 	call kernel_main
