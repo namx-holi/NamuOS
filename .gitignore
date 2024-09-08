@@ -10,3 +10,6 @@ old
 
 # Generated documentation
 doxygen
+
+# Note taking while implementing memory
+device_notes.txt

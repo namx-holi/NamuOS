@@ -31,7 +31,7 @@
 #define BDA_EBDA_SEGMENT ((uint16_t*)0x040e) // word
 
 // Ref: https://stanislavs.org/helppc/int_11.html
-#define BDA_EQUIPMENT_LIST_FLAGS ((uint16_t*)0xc0000410) // 2 bytes
+#define BDA_EQUIPMENT_LIST_FLAGS ((uint16_t*)0x0410) // 2 bytes
     #define BDA_EQUIPT_IPL_MASK 0x0001
     #define BDA_EQUIPT_IPL_SHIFT 0
     #define BDA_EQUIPT_MATH_COPROCESSOR_MASK 0x0002
@@ -165,8 +165,8 @@
 
 // NOTE: This is what the addresses look like when fully mapping the first 1 MiB
 //  in the page table, not specifically looking for VGA.
-#define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xc00b0000)
-#define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xc00b8000)
+#define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xb0000)
+#define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xb8000)
 
 
 

@@ -3,20 +3,15 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <kernel/multiboot.h>
 
-#include <kernel/bios.h>
-#include <kernel/bios_defines.h>
-#include <kernel/tty.h>
-#include "multiboot.h"
+#include <kernel/tty.h> // terminal_initialise
+#include <kernel/memory.h> // memory_initialise
 
 // TODO: Define `panic` instead of using abort
 
-// TODO: Better name for this
-#define KERNEL_BASE_PTR 0xC0000000
 
-
-
-void kernel_main(multiboot_info_t* mbd, uint32_t magic) {
+void kernel_main(multiboot_info_t* mb_info, uint32_t magic) {
 	terminal_initialise();
 
 	// TODO: Move all the initialisation checks to a separate method
@@ -43,26 +38,40 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic) {
 	// printf("Video framebuffer information present: %d\n", mbd->flags & MULTIBOOT_INFO_FRAMEBUFFER_INFO);
 	// printf("\n");
 
-	// Make sure we have a valid memory map
-	if (!(mbd->flags & MULTIBOOT_INFO_MEM_MAP)) {
-		printf("Invalid memory map given by GRUB\n");
+	if (!memory_initialise(mb_info)) {
+		printf("Failed to initialise memory.\n");
 		abort();
 	}
-	// Loop through memory map and display values
-	for (uint32_t i = 0; i < mbd->mmap_length; i += sizeof(multiboot_memory_map_t)) {
-		// Fetch the memory map. Need to add kernel base to address to be valid
-		multiboot_memory_map_t* mmmt = (multiboot_memory_map_t*)(mbd->mmap_addr + i + KERNEL_BASE_PTR);
 
-		printf("Start Addr: %lx | Length: %lx | Size: %x | Type: %d | ",
-			mmmt->addr, mmmt->len, mmmt->size, mmmt->type);
-		switch (mmmt->type) {
-			case MULTIBOOT_MEMORY_AVAILABLE: printf("Available\n"); break;
-			case MULTIBOOT_MEMORY_RESERVED: printf("Reserved\n"); break;
-			case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE: printf("ACPI Reclaimable\n"); break;
-			case MULTIBOOT_MEMORY_NVS: printf("NVS\n"); break;
-			case MULTIBOOT_MEMORY_BADRAM: printf("Bad RAM\n"); break;
-			default: printf("???\n");
+	if (mb_info->flags & MULTIBOOT_INFO_BOOTDEV)
+		printf("boot device = 0x%x\n", mb_info->boot_device);
+	
+	if (mb_info->flags & MULTIBOOT_INFO_CMDLINE)
+		printf("cmdline ptr = 0x%p\n", mb_info->cmdline);
+	
+	if (mb_info->flags & MULTIBOOT_INFO_MODS) {
+		multiboot_module_t* mod;
+		int i;
+
+		printf("mods_count = %d, mods_addr = 0x$x\n", mb_info->mods_count, mb_info->mods_addr);
+		for (i=0, mod = (multiboot_module_t*)mb_info->mods_addr; i < mb_info->mods_count; ++i, ++mod) {
+			printf(" mod_start = 0x%x, mod_end = 0x%x, cmdline = %s\n",
+				(unsigned)(mod->mod_start),
+				(unsigned)(mod->mod_end),
+				(char*)mod->cmdline);
 		}
+	} else {
+		printf("No boot modules!\n");
+	}
+	printf("\n");
+
+	if (mb_info->flags & MULTIBOOT_INFO_VBE_INFO) {
+		printf("vbe_control_info is %x\n", mb_info->vbe_control_info);
+		printf("vbe_mode_info is %x\n", mb_info->vbe_mode_info);
+
+		
+	} else {
+		printf("No VBE info!\n");
 	}
 
 	// printf("== Detected Hardware ==\n");
