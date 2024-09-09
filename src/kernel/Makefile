@@ -24,15 +24,16 @@ KERNEL_BOOT_END_OBJ=\
 	$(BUILD_DIR)/crtn.o
 
 # Kernel source
-KERNEL_C_SRC=$(wildcard *.c)
+KERNEL_C_SRC=$(wildcard *.c) $(wildcard **/*.c)
 KERNEL_C_OBJ=$(patsubst %.c, $(BUILD_DIR)/%.o, $(KERNEL_C_SRC))
+KERNEL_SRC_DIRS=$(wildcard **/)
+KERNEL_OBJ_DIRS=$(patsubst %, $(BUILD_DIR)/%, $(KERNEL_SRC_DIRS))
 LINKER=linker.ld
 
 
-.phony: build
+.phony: build clean
 
-build: $(BUILD_DIR) $(KERNEL)
-	echo $(LIBC_OBJ_DIRS)
+build: $(BUILD_DIR) $(KERNEL_OBJ_DIRS) $(KERNEL)
 
 $(KERNEL): $(KERNEL_BOOT_START_OBJ) $(KERNEL_BOOT_END_OBJ) $(KERNEL_C_OBJ)
 	$(ASM) $(ASM_FLAGS) --sysroot=$(SYSROOT) -isystem=/usr/include -T $(LINKER) -o $(KERNEL) $(KERNEL_BOOT_START_OBJ) $(KERNEL_C_OBJ) -nostdlib -lk -lgcc $(KERNEL_BOOT_END_OBJ)
@@ -64,6 +65,9 @@ $(BUILD_DIR)/%.o: %.S
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
+
+$(KERNEL_OBJ_DIRS):
+	mkdir -p $@
 
 clean:
 	rm -rf $(BUILD_DIR)

@@ -41,8 +41,8 @@ install_headers:
 
 
 build_project:
-	$(MAKE) -C src/libc build
-	$(MAKE) -C src/kernel build
+	$(MAKE) -j4 -C src/libc build
+	$(MAKE) -j4 -C src/kernel build
 
 qemu:
 	qemu-system-i386 -cdrom $(ISO_OBJ)
