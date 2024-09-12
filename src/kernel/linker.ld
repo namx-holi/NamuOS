@@ -1,28 +1,39 @@
+OUTPUT_FORMAT(elf32-i386)
+OUTPUT_ARCH(i386)
+
 ENTRY(_start)
-
+phys = 0x00100000;
 SECTIONS {
-	/* Load kernel at 1M */
-	. = 1M;
-
-	/* Start with multiboot header and text section */
-	.multiboot.header BLOCK(4K) : ALIGN(4K) {
+	/* Actual code */
+	.text phys : AT(phys) {
+		code = .;
 		*(.multiboot.header)
 		*(.text)
-	}
-
-	/* Read-only data */
-	.rodata BLOCK(4K) : ALIGN(4K) {
 		*(.rodata)
+		. = ALIGN(4096);
 	}
 
-	/* Read-write data (initialised) */
-	.data BLOCK(4K) : ALIGN(4K) {
+	/* Kernel data */
+	.data : AT(phys + (data - code)) {
+		data = .;
 		*(.data)
+		. = ALIGN(4096);
 	}
 
-	/* Read-write data (uninitialised) and stack */
-	.data BLOCK(4K) : ALIGN(4K) {
-		*(COMMON)
+	/* Statically defined, uninitialised values */
+	.bss : AT(phys + (bss - code)) {
+		bss = .;
 		*(.bss)
+		. = ALIGN(4096);
+	}
+
+	/* End of kernel */
+	end = .;
+
+	/* Get rid of unnecessary GCC bits */
+	/DISCARD/ : {
+		*(.comment)
+		/* *(.eh_frame) */
+		*(.note.gnu.build-id)
 	}
 }

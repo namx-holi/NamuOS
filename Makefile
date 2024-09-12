@@ -46,6 +46,7 @@ build_project:
 
 qemu:
 	qemu-system-i386 -cdrom $(ISO_OBJ)
+# NOTE: Can add -d int for debugging
 
 clean:
 	rm -rf $(BUILD_DIR)
