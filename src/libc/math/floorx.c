@@ -1,7 +1,9 @@
 /// @file floorx.c
 
+#include <math.h> // Implements
+
 #include <stdint.h>
-#include <math.h>
+
 
 // TODO: Rewrite this a bit, and add floorf and floorl
 

@@ -22,7 +22,8 @@
 #ifndef _LIBC_WCHAR_H
 #define _LIBC_WCHAR_H 1
 
-#include <stdio.h> // FILE, va_list via <stdarg.h>
+#include <decl_FILE.h> // FILE
+#include <stdarg.h> // va_list
 #include <time.h> // struct tm
 
 
