@@ -5,13 +5,13 @@
 #include <kernel/system.h> // kprintf
 
 
-PTE_t* get_page(uintptr_t address) {
+PTE_t* get_page(void* address) {
 	// PDE is selected using the physical address defined as follows:
 	// - Bits 39:32 are 0
 	// - Bits 31:12 are from CR3
 	// - Bits 11:2 are bits 31:22 of the linear address
 	// - Bits 1:0 are 0
-	uintptr_t pde_phys = (cr3.addr << 12) | ((address >> 22) << 2);
+	physical_addr_t pde_phys = (cr3.addr << 12) | (((physical_addr_t)address >> 22) << 2);
 	PDE_t* pde = (PDE_t*)pde_phys;
 	if (!pde->present) {
 		// TODO: Page fault
@@ -27,7 +27,7 @@ PTE_t* get_page(uintptr_t address) {
 	// - Bits 31:12 are from the PDE
 	// - Bits 11:2 are bits 21:12 of the linear address
 	// - Bits 1:0 are 0
-	uintptr_t pte_phys = (pde->addr << 12) | (((address >> 12) & 0x3ff) << 2);
+	physical_addr_t pte_phys = (pde->addr << 12) | ((((physical_addr_t)address >> 12) & 0x3ff) << 2);
 	PTE_t* pte = (PTE_t*)pte_phys;
 	if (!pte->present) {
 		// TODO: Page fault
@@ -38,7 +38,7 @@ PTE_t* get_page(uintptr_t address) {
 	return pte;
 }
 
-uintptr_t get_physical_address(uintptr_t address) {
+physical_addr_t get_physical_address(void* address) {
 	// Get the page this address sits in
 	PTE_t* pte = get_page(address);
 	if (pte == NULL) {
@@ -50,6 +50,6 @@ uintptr_t get_physical_address(uintptr_t address) {
 	// - Bits 39:32 are 0
 	// - Bits 31:12 are from the PTE
 	// - Bits 11:0 are from the original linear address
-	uintptr_t addr = (pte->addr << 12) | (address & 0xfff);
+	physical_addr_t addr = (pte->addr << 12) | ((physical_addr_t)address & 0xfff);
 	return addr;
 }

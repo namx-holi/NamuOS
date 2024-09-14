@@ -32,10 +32,12 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t magic, uintptr_t mb_esp) {
 	// kprintf("end pointer is  0x%p\n", &end);
 	// kprintf("esp is 0x%p\n", esp);
 
-	// kprintf("mem_lower = %d KiB\n", mb_info->mem_lower);
-	// kprintf("mem_upper = %d KiB\n", mb_info->mem_upper);
+	kprintf("mem_lower = %d KiB\n", mb_info->mem_lower);
+	kprintf("mem_upper = %d KiB\n", mb_info->mem_upper);
 
-	setup_paging(mb_info->mem_lower + mb_info->mem_upper);
+	setup_paging(mb_info);
+	while(1) {}
+	kprintf("Test printing post-paging enable! I'm printing while paging enabled!\n");
 
 	abort();
 }

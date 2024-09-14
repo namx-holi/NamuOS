@@ -139,8 +139,7 @@ int kernel_setup_kprintf(multiboot_info_t* mb_info) {
 	return 0; // success
 }
 
-void kernel_kprintf_shift_ega_addr(uint32_t add) {
-	kprintf("EGA_MEMORY_ADDR will become 0x%p\n", ((uintptr_t)EGA_MEMORY_ADDR + add));
+void kernel_kprintf_shift_ega_addr(physical_addr_t add) {
 	EGA_MEMORY_ADDR = (uint16_t*)((uintptr_t)EGA_MEMORY_ADDR + add);
 }
 

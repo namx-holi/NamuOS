@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <kernel/multiboot.h> // multiboot_info_t
+#include <kernel/system.h>
 
 // Representation of the CR3 register
 union CR3_register {
@@ -192,32 +194,32 @@ extern CR3_register_t cr3;
 
 
 // Enables paging
-extern void setup_paging(uint32_t memsize_kb);
+extern void setup_paging(multiboot_info_t* mb_info);
 
 // Sets `placement_pointer`
-extern void kmalloc_startat(uintptr_t address);
+extern void kmalloc_startat(physical_addr_t address);
 
 // Allocates a block at physical address if heap not set up
-extern uintptr_t kmalloc_real(size_t size, int align, uintptr_t* phys);
+extern physical_addr_t kmalloc_real(size_t size, int align, physical_addr_t* phys);
 
 // Allocates a block
-extern uintptr_t kmalloc(size_t size);
+extern physical_addr_t kmalloc(size_t size);
 
 // Allocates an aligned block
-extern uintptr_t kvmalloc(size_t size);
+extern physical_addr_t kvmalloc(size_t size);
 
 // Allocates a block at physical address
-extern uintptr_t kmalloc_p(size_t size, uintptr_t* phys);
+extern physical_addr_t kmalloc_p(size_t size, physical_addr_t* phys);
 
 // Allocates an aligned block at physical address
-extern uintptr_t kvmalloc_p(size_t size, uintptr_t* phys);
+extern physical_addr_t kvmalloc_p(size_t size, physical_addr_t* phys);
 
 
 // Gets a page given the virtual address
-extern PTE_t* get_page(uintptr_t address);
+extern PTE_t* get_page(void* address);
 
 // Translates virtual address to physical address
-extern uintptr_t get_physical_address(uintptr_t address);
+extern physical_addr_t get_physical_address(void* address);
 
 
 

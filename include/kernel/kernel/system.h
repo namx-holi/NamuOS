@@ -7,9 +7,12 @@
 
 #include <kernel/multiboot.h>
 
+// Type used for pointers to physical addresses
+typedef uintptr_t physical_addr_t;
+
 // kprintf
 extern int kernel_setup_kprintf(multiboot_info_t* mb_info);
-extern void kernel_kprintf_shift_ega_addr(uint32_t add);
+extern void kernel_kprintf_shift_ega_addr(physical_addr_t add);
 extern int kprintf(const char* restrict format, ...);
 extern int kvprintf(const char* restrict format, va_list arg);
 
