@@ -5,102 +5,111 @@
 #include <string.h> // memset
 #include <kernel/system.h> // reset VGA memory address
 
+// Begin placement of kmalloc memory after end of kernel image
+extern void* end_addr; // See linker.ld for where this comes from
+uintptr_t placement_pointer = (uintptr_t)&end_addr;
 
-extern void* end; // Free space located after stack. See boot.S
-physical_addr_t placement_pointer = (physical_addr_t)&end;
-physical_addr_t heap_end = (physical_addr_t)NULL; // NOTE: Currently not used
+// Pointer to kernel page directory, and current page directory. Both in the
+//  style CR3 expects
+uintptr_t kernel_page_directory = (uintptr_t)NULL;
+uintptr_t current_page_directory = (uintptr_t)NULL;
 
-CR3_register_t cr3; // Spoof CR3 register
+// NOTE: Currently unused
+uintptr_t heap_end = (uintptr_t)NULL;
 
 
-void kmalloc_startat(physical_addr_t address) {
+
+void kmalloc_startat(uintptr_t address) {
 	placement_pointer = address;
 }
 
+
 void setup_paging(multiboot_info_t* mb_info) {
-	// TODO: Reserve entire 0xC...0xF block as kernel only
-	// TODO: Linear map 0x0...1MiB + mem_lower as kernel
-	// TODO: Reserve space for anything past mem_lower for non-contiguous mapping
-	//  in kernel space
-	// TODO: Every address 0x0...-0xC is user space. Save PAGE_OFFSET somewhere
-
-	// TODO: Reserve 0xC0000000 - 0xFFFFFFFF as kernel only
-	// TODO: Use mem_lower as reference of how much to map for kernel
-
-	// Initialise dummy CR3 register
-	cr3.ignored_1 = 0;
-	cr3.pwt = 0;
-	cr3.pcd = 0;
-	cr3.ignored_2 = 0;
-	cr3.addr = 0;
-
-	// Allocate space for the page directory, and kernel page table.
-	physical_addr_t page_directory_phys;
-	physical_addr_t kernel_page_table_phys;
-	PDE_t* page_directory = (PDE_t*)kvmalloc_p(1024 * sizeof(PDE_t), &page_directory_phys);
-	PTE_t* kernel_page_table = (PTE_t*)kvmalloc_p(1024 * sizeof(PTE_t), &kernel_page_table_phys);
-	// Make sure directory and tables are cleared
-	memset(page_directory, 0, 1024 * sizeof(PDE_t));
-	memset(kernel_page_table, 0, 1024 * sizeof(PTE_t));
-
-	// Enable writing for all page directory entries
-	for (int i = 0; i < 1024; ++i)
+	// Allocate space for the page directory, and enable writing for all entries
+	uintptr_t page_directory_phys;
+	PDE_t* page_directory = (PDE_t*)kvmalloc_p(PAGE_STRUCTURE_SIZE, &page_directory_phys);
+	memset(page_directory, 0, PAGE_STRUCTURE_SIZE);
+	for (int i = 0; i < PAGE_ENTRY_COUNT; ++i)
 		page_directory[i].rw = 1;
 	
-	// Map the first 4 MiB as 'kernel'. This includes any BIOS flags, VGA memory
-	//  address, the kernel itself, and 3 MiB for these tables and any heap
-	for (int i = 0; i < 1024; ++i) {
-		kernel_page_table[i].present = 1;
-		kernel_page_table[i].rw      = 1; // Can read/write
-		kernel_page_table[i].user    = 0; // No user-mode access
-		kernel_page_table[i].dirty   = 1; // These pages are written to
-		kernel_page_table[i].addr    = i;
+	// The first 8 MiB of physical address space is reserved at the start of
+	//  kernel-space for the kernel image.
+	// Allocate two pages worth of memory space and link to the page directory
+	uintptr_t pte0_phys;
+	uintptr_t pte1_phys;
+	PTE_t* pte0 = (PTE_t*)kvmalloc_p(PAGE_STRUCTURE_SIZE, &pte0_phys);
+	PTE_t* pte1 = (PTE_t*)kvmalloc_p(PAGE_STRUCTURE_SIZE, &pte1_phys);
+	memset(pte0, 0, PAGE_STRUCTURE_SIZE);
+	memset(pte1, 0, PAGE_STRUCTURE_SIZE);
+	// Linear mapping of 4 MiB in PTE0, and next 4 MiB in PTE1
+	// TODO: Get info on where .text and .rodata are, and mark as read-only
+	for (int i = 0; i < PAGE_ENTRY_COUNT; ++i) { // PTE 0
+		pte0[i].present = 1;
+		pte0[i].rw      = 1; // Can read/write
+		pte0[i].dirty   = 1; // Currently in use
+		pte0[i].addr    = i;
 	}
+	for (int i = 0; i < PAGE_ENTRY_COUNT; ++i) { // PTE 1
+		pte1[i].present = 1;
+		pte1[i].rw      = 1; // Can read/write
+		pte1[i].dirty   = 1; // Currently in use
+		pte1[i].addr    = i + PAGE_ENTRY_COUNT; // Offset after PTE 0
+	}
+	// Kernel starts at PAGE_OFFSET
+	uint32_t kernel_start_pde = PAGE_OFFSET / (PAGE_ENTRY_COUNT * PAGE_FRAME_SIZE);
+	// Place PTE0 and PTE1 at where PAGE_OFFSET lines up in page directory
+	page_directory[kernel_start_pde].present   = 1;
+	page_directory[kernel_start_pde].addr      = (uint32_t)pte0 / PAGE_FRAME_SIZE;
+	page_directory[kernel_start_pde+1].present = 1;
+	page_directory[kernel_start_pde+1].addr    = (uint32_t)pte1 / PAGE_FRAME_SIZE;
 
-	// TODO: Set .text and .rodata regions to read-only
-	// TODO: After above, disable execution of non-.text sections
 
-	// Identity map the kernel page table by placing in page directory at 0
-	page_directory[0x0].present = 1;
-	page_directory[0x0].user    = 1; // No user-mode access
-	page_directory[0x0].addr = (uint32_t)kernel_page_table / 0x1000;
+	// TODO: Map all of 0xc0000000 - 0xc1000000 as ZONE_DMA
+	// TODO: Reserve 0xc1000000 - 0xf8000000 as ZONE_NORMAL
+	// TODO: Map all of 0xf8000000 - 0xffffffff as ZONE_HIGHMEM
+	// TODO: Map last couple pages for fixmap, get from mb_info
 
-	// Also map the kernel to higher half using page directory entry 768. This
-	//  number in particular is used as it's 75% of the way through memory
-	//  space, mapping the kernel to start at 0xC0000000.
-	// NOTE: 1024 == 0x400, 768 == 0x300
-	page_directory[0x300].present = 1;
-	page_directory[0x300].user    = 1; // No user-mode access
-	page_directory[0x300].addr = (uint32_t)kernel_page_table / 0x1000;
 
-	// Enable paging by setting the CR3 register
-	cr3.addr = (uint32_t)page_directory / 0x1000;
-	asm volatile ("mov %0, %%cr3" : : "r"(cr3.raw)); // Set location of PD
+	// Set up an identity mapping of kernel image so things still work once
+	//  paging is initially turned on
+	page_directory[0].present = 1;
+	page_directory[0].addr    = (uint32_t)pte0 / PAGE_FRAME_SIZE;
+	page_directory[1].present = 1;
+	page_directory[1].addr    = (uint32_t)pte1 / PAGE_FRAME_SIZE;
+
+	// Set up CR3 register by setting the paging directory address. We don't
+	//  need to set any flags (bit 3 PWT or bit 4 PCD).
+	// NOTE: We could just set it to page directory, as /PAGE_FRAME_SIZE is
+	//  equivalent to >> 12, and it should be 4 KiB aligned anyway. It's left
+	//  as this for now so it's much clearer as to what bits are set.
+	uint32_t cr3 = ((uint32_t)page_directory / PAGE_FRAME_SIZE) << 12;
+	asm volatile ("mov %0, %%cr3" : : "r"(cr3));
+
+	// Set bits 31 and 16 in CR0 to enable paging and write protect respectively
 	uint32_t cr0;
-	asm volatile ("mov %%cr0, %0" : "=r"(cr0)); // Pull current value of CR0 register
-	cr0 |= 0x80010000; // Update CR0 to enable paging (bit 31) with write protect (bit 16)
-	asm volatile ("mov %0, %%cr0" : : "r"(cr0)); // Tell CPU to enable paging
+	asm volatile ("mov %%cr0, %0" : "=r"(cr0));
+	cr0 |= 0x80010000;
+	asm volatile ("mov %0, %%cr0" : : "r"(cr0));
 
-	// Readjust the VGA memory address so we can still use kprintf
-	kernel_kprintf_shift_ega_addr(0xC0000000); // New kernel start address!
-	kprintf("PDE[0] addr is 0x%p\n", &page_directory[0]);
+	// NOTE: May need to force a TLB flush so our paging changes work properly.
+	uint32_t temp;
+	asm volatile ("mov %%cr3, %0" : "=r"(temp));
+	asm volatile ("mov %0, %%cr3" : : "r"(temp));
 
-	// We no longer need the kernel identity mapping since paging enabled, unmap
+	// Since paging is now enabled, VGA memory needs to be addressed with
+	//  PAGE_OFFSET added.
+	kernel_kprintf_update_page_offset(PAGE_OFFSET);
+
+	// NOTE: Load-bearing kprintf... for some reason if this isn't called,
+	//  the identity mapping can't be removed.
+	kprintf("");
+
+	// We no longer need the kernel image identity mapping since paging is now
+	//  functioning! We can unmap now
+	// TODO: This *doesn't* work when running via VirtualBox. Unsure why, but
+	//  it seems to cause a triple page fault
 	page_directory[0].present = 0;
-	while(1){}
-	page_directory[0].addr = 0;
-
-	// TODO: Reload CR3 to force TLB flush so our paging changes can take effect
-	//  This might require an assembly routine instead of inline.
-	// asm volatile ("mov %%cr3, %0" : "=r"(temp));
-	// asm volatile ("mov %0, %%cr3" : : "r"(cr3.raw));
-
-	// TODO: Map the remaining space, using mem-map entries as reference!
-
-
-
-	// We also have some extra free memory usable 
-
-
-
+	page_directory[0].addr    = 0;
+	page_directory[1].present = 0;
+	page_directory[1].addr    = 0;
 }

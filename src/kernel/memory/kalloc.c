@@ -7,7 +7,7 @@
 #include <kernel/system.h> // DEBUG: kprintf
 
 
-physical_addr_t kmalloc_real(size_t size, int align, physical_addr_t* phys) {
+uintptr_t kmalloc_real(size_t size, int align, uintptr_t* phys) {
 	// If heap already set up, pass to malloc instead
 	if (heap_end) {
 		void* address;
@@ -21,11 +21,11 @@ physical_addr_t kmalloc_real(size_t size, int align, physical_addr_t* phys) {
 		//  we use to physical address and set `phys`
 		if (phys) {
 			// TODO: Handle page fault
-			*phys = get_physical_address(address);
+			*phys = translate_virtual_address(address);
 		}
 		
 		// Return the virtual address from allocation
-		return (physical_addr_t)address;
+		return (uintptr_t)address;
 	}
 
 	// If asked to align (and not already aligned), move to the next 4 KiB page
@@ -42,23 +42,23 @@ physical_addr_t kmalloc_real(size_t size, int align, physical_addr_t* phys) {
 	
 	// Return the address of the start of allocation, and update placement
 	//  pointer for next allocation
-	physical_addr_t address = placement_pointer;
+	uintptr_t address = placement_pointer;
 	placement_pointer += size;
 	return address;
 }
 
-physical_addr_t kmalloc(size_t size) {
+uintptr_t kmalloc(size_t size) {
 	return kmalloc_real(size, 0, NULL);
 }
 
-physical_addr_t kvmalloc(size_t size) {
+uintptr_t kvmalloc(size_t size) {
 	return kmalloc_real(size, 1, NULL);
 }
 
-physical_addr_t kmalloc_p(size_t size, physical_addr_t* phys) {
+uintptr_t kmalloc_p(size_t size, uintptr_t* phys) {
 	return kmalloc_real(size, 0, phys);
 }
 
-physical_addr_t kvmalloc_p(size_t size, physical_addr_t* phys) {
+uintptr_t kvmalloc_p(size_t size, uintptr_t* phys) {
 	return kmalloc_real(size, 1, phys);
 }

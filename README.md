@@ -79,3 +79,4 @@ You can run the OS with qemu using `make qemu`
 - Implement a way to launch OS in debug mode within VS Code
 - Documentation for kernel side
 - Handle other C locales other than default?
+- Move architecture-specific code to separate folders

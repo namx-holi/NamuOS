@@ -20,7 +20,7 @@
 
 
 # Some external references
-.extern code, data, bss, end
+.extern code_addr, data_addr, bss_addr, end_addr
 
 
 # Kernel entry point

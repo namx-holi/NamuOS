@@ -8,6 +8,23 @@
 #include <kernel/multiboot.h> // multiboot_info_t
 #include <kernel/system.h>
 
+// Where the kernel is placed
+#define PAGE_OFFSET 0xC0000000
+
+// Sizes and offsets of memory zones in kernel space
+#define ZONE_DMA_OFFSET     0x00000000
+#define ZONE_DMA_SIZE       0x01000000 // First 16 MiB of memory
+#define ZONE_NORMAL_OFFSET  0x01000000
+#define ZONE_NORMAL_SIZE    0x37000000 // 16 MiB - 896 MiB
+#define ZONE_HIGHMEM_OFFSET 0x38000000
+#define ZONE_HIGHMEM_SIZE   0x08000000 // 896 MiB - End
+
+// Page sizes
+#define PAGE_STRUCTURE_SIZE 4096 // Size in bytes of a directory/table
+#define PAGE_ENTRY_COUNT    1024 // How many entries per directory/table
+#define PAGE_FRAME_SIZE     4096 // Size of physical memory an entry points to
+
+
 // Representation of the CR3 register
 union CR3_register {
 	struct {
@@ -183,46 +200,50 @@ union page_PTE {
 typedef union page_PTE PTE_t;
 
 
-// Used to keep track of where to place new allocations
+
+// Pointer to the start of free low memory in kernel-space
 extern uintptr_t placement_pointer;
 
-// TODO: Doc, currently unused
+// Pointer to kernel page directory, and current page directory. Both in the
+//  style CR3 expects as an address
+extern uintptr_t kernel_page_directory;
+extern uintptr_t current_page_directory;
+
+// TODO: Heap?
 extern uintptr_t heap_end;
 
-// Dummy CR3 register. The first paging structure used for any translation.
-extern CR3_register_t cr3;
 
-
-// Enables paging
-extern void setup_paging(multiboot_info_t* mb_info);
-
-// Sets `placement_pointer`
-extern void kmalloc_startat(physical_addr_t address);
-
-// Allocates a block at physical address if heap not set up
-extern physical_addr_t kmalloc_real(size_t size, int align, physical_addr_t* phys);
 
 // Allocates a block
-extern physical_addr_t kmalloc(size_t size);
+extern uintptr_t kmalloc(size_t size);
 
 // Allocates an aligned block
-extern physical_addr_t kvmalloc(size_t size);
+extern uintptr_t kvmalloc(size_t size);
 
 // Allocates a block at physical address
-extern physical_addr_t kmalloc_p(size_t size, physical_addr_t* phys);
+extern uintptr_t kmalloc_p(size_t size, uintptr_t* phys);
 
 // Allocates an aligned block at physical address
-extern physical_addr_t kvmalloc_p(size_t size, physical_addr_t* phys);
+extern uintptr_t kvmalloc_p(size_t size, uintptr_t* phys);
+
+// Allocates a block at physical address if heap not set up
+extern uintptr_t kmalloc_real(size_t size, int align, uintptr_t* phys);
+
+// Sets the @ref placement_pointer
+extern void kmalloc_startat(uintptr_t address);
 
 
-// Gets a page given the virtual address
+
+
+
+
+// Sets up paging, and enables on the CPU
+extern void setup_paging(multiboot_info_t* mb_info);
+
+// Fetches a page given the virtual address
 extern PTE_t* get_page(void* address);
 
 // Translates virtual address to physical address
-extern physical_addr_t get_physical_address(void* address);
-
-
-
-
+extern uintptr_t translate_virtual_address(void* address);
 
 #endif

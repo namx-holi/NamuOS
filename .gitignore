@@ -12,4 +12,7 @@ old
 doxygen
 
 # Note taking while implementing memory
-device_notes.txt
+device_notes.*
+
+# Reference material, pdfs etc
+ref_material
