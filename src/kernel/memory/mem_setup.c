@@ -1,115 +1,171 @@
-/// @file mem_setup.c
-
 #include <kernel/memory.h> // Implements
 
+#include <stddef.h> // size_t
 #include <string.h> // memset
-#include <kernel/system.h> // reset VGA memory address
 
-// Begin placement of kmalloc memory after end of kernel image
-extern void* end_addr; // See linker.ld for where this comes from
-uintptr_t placement_pointer = (uintptr_t)&end_addr;
-
-// Pointer to kernel page directory, and current page directory. Both in the
-//  style CR3 expects
-uintptr_t kernel_page_directory = (uintptr_t)NULL;
-uintptr_t current_page_directory = (uintptr_t)NULL;
-
-// NOTE: Currently unused
-uintptr_t heap_end = (uintptr_t)NULL;
+#include <kernel/system.h> // Update kprintf pointers
 
 
+// Physical addresses of regions of the kernel image
+extern void* kernel_addr;      // Start address of the kernel image
+extern void* code_end_addr;    // End of read-only kernel image region
+extern void* kernel_end_addr;  // End address of kernel image
 
-void kmalloc_startat(uintptr_t address) {
-	placement_pointer = address;
+
+// This acts as a boot memory allocator. We can allocate memory immediately
+//  after the end of the kernel image.
+uintptr_t placement_pointer = (uintptr_t)&kernel_end_addr;
+
+
+
+
+// Boot allocators
+uintptr_t bmalloc_real(size_t size, int align, uintptr_t* paddr) {
+	// If asked to align, move to next page boundary
+	if (align)
+		placement_pointer = PAGE_ALIGN(placement_pointer);
+	
+	// If given a physical address pointer, set to the location this allocation
+	//  takes place
+	if (paddr)
+		*paddr = placement_pointer;
+	
+	// Return the address of the start of allocation, and update placement
+	//  pointer for next allocation
+	uintptr_t addr = placement_pointer;
+	placement_pointer += size;
+	return addr;
+}
+uintptr_t bmalloc(size_t size) {
+	return bmalloc_real(size, 0, NULL); // Not aligned, no phys address
+}
+uintptr_t bvmalloc(size_t size) {
+	return bmalloc_real(size, 1, NULL); // Aligned, no phys address
+}
+uintptr_t bmalloc_p(size_t size, uintptr_t* paddr) {
+	return bmalloc_real(size, 0, paddr); // Not aligned, phys address
+}
+uintptr_t bvmalloc_p(size_t size, uintptr_t* paddr) {
+	return bmalloc_real(size, 1, paddr); // Aligned, phys address
 }
 
 
-void setup_paging(multiboot_info_t* mb_info) {
-	// Allocate space for the page directory, and enable writing for all entries
-	uintptr_t page_directory_phys;
-	PDE_t* page_directory = (PDE_t*)kvmalloc_p(PAGE_STRUCTURE_SIZE, &page_directory_phys);
-	memset(page_directory, 0, PAGE_STRUCTURE_SIZE);
-	for (int i = 0; i < PAGE_ENTRY_COUNT; ++i)
-		page_directory[i].rw = 1;
-	
-	// The first 8 MiB of physical address space is reserved at the start of
-	//  kernel-space for the kernel image.
-	// Allocate two pages worth of memory space and link to the page directory
-	uintptr_t pte0_phys;
-	uintptr_t pte1_phys;
-	PTE_t* pte0 = (PTE_t*)kvmalloc_p(PAGE_STRUCTURE_SIZE, &pte0_phys);
-	PTE_t* pte1 = (PTE_t*)kvmalloc_p(PAGE_STRUCTURE_SIZE, &pte1_phys);
-	memset(pte0, 0, PAGE_STRUCTURE_SIZE);
-	memset(pte1, 0, PAGE_STRUCTURE_SIZE);
-	// Linear mapping of 4 MiB in PTE0, and next 4 MiB in PTE1
-	// TODO: Get info on where .text and .rodata are, and mark as read-only
-	for (int i = 0; i < PAGE_ENTRY_COUNT; ++i) { // PTE 0
-		pte0[i].present = 1;
-		pte0[i].rw      = 1; // Can read/write
-		pte0[i].dirty   = 1; // Currently in use
-		pte0[i].addr    = i;
+// Global Page Directory
+PDE_t* pgd;
+
+
+// Test method to check if we are setting the correct addresses in page table
+uintptr_t test_translate(void* addr) {
+	kprintf("PGD paddr = 0x%p\n", pgd);
+
+	uintptr_t pde_paddr = (uintptr_t)(pgd) | (((uintptr_t)addr >> 22) << 2);
+	kprintf("pde_paddr = 0x%p\n", pde_paddr);
+	PDE_t* pde = (PDE_t*)pde_paddr;
+	if (!pde->present) {
+		kprintf("Page fault for that PDE\n");
+		return 0;
 	}
-	for (int i = 0; i < PAGE_ENTRY_COUNT; ++i) { // PTE 1
-		pte1[i].present = 1;
-		pte1[i].rw      = 1; // Can read/write
-		pte1[i].dirty   = 1; // Currently in use
-		pte1[i].addr    = i + PAGE_ENTRY_COUNT; // Offset after PTE 0
+
+	uintptr_t pte_paddr = (pde->addr << 12) | ((((uintptr_t)addr >> 12) & 0x3ff) << 2);
+	kprintf("pte_paddr = 0x%p\n", pte_paddr);
+	PTE_t* pte = (PTE_t*)pte_paddr;
+	if (!pte->present) {
+		kprintf("Page fault for that PTE\n");
+		return 0;
 	}
-	// Kernel starts at PAGE_OFFSET
-	uint32_t kernel_start_pde = PAGE_OFFSET / (PAGE_ENTRY_COUNT * PAGE_FRAME_SIZE);
-	// Place PTE0 and PTE1 at where PAGE_OFFSET lines up in page directory
-	page_directory[kernel_start_pde].present   = 1;
-	page_directory[kernel_start_pde].addr      = (uint32_t)pte0 / PAGE_FRAME_SIZE;
-	page_directory[kernel_start_pde+1].present = 1;
-	page_directory[kernel_start_pde+1].addr    = (uint32_t)pte1 / PAGE_FRAME_SIZE;
+
+	uintptr_t paddr = (pte->addr << 12) | ((uintptr_t)addr & 0x3ff);
+	kprintf("paddr = 0x%p\n", paddr);
+
+	return paddr;
+}
 
 
-	// TODO: Map all of 0xc0000000 - 0xc1000000 as ZONE_DMA
-	// TODO: Reserve 0xc1000000 - 0xf8000000 as ZONE_NORMAL
-	// TODO: Map all of 0xf8000000 - 0xffffffff as ZONE_HIGHMEM
-	// TODO: Map last couple pages for fixmap, get from mb_info
 
+void memory_node_setup(multiboot_info_t* mb_info) {
+	// TODO
+}
 
-	// Set up an identity mapping of kernel image so things still work once
-	//  paging is initially turned on
-	page_directory[0].present = 1;
-	page_directory[0].addr    = (uint32_t)pte0 / PAGE_FRAME_SIZE;
-	page_directory[1].present = 1;
-	page_directory[1].addr    = (uint32_t)pte1 / PAGE_FRAME_SIZE;
+void memory_paging_setup() {
+	// Allocate space for the kernel page directory
+	uintptr_t pgd_phys;
+	pgd = (PDE_t*)bvmalloc_p(sizeof(uint32_t) * PTRS_PER_PDE, &pgd_phys);
+	memset(pgd, 0, sizeof(uint32_t) * PTRS_PER_PDE);
+	// Enable writing for all entries
+	for (int i = 0; i < PTRS_PER_PDE; ++i) {
+		pgd[i].rw = 1;
+	}
 
-	// Set up CR3 register by setting the paging directory address. We don't
-	//  need to set any flags (bit 3 PWT or bit 4 PCD).
-	// NOTE: We could just set it to page directory, as /PAGE_FRAME_SIZE is
-	//  equivalent to >> 12, and it should be 4 KiB aligned anyway. It's left
-	//  as this for now so it's much clearer as to what bits are set.
-	uint32_t cr3 = ((uint32_t)page_directory / PAGE_FRAME_SIZE) << 12;
-	asm volatile ("mov %0, %%cr3" : : "r"(cr3));
+	// Allocate space for 8 MiB worth of page tables to map the kernel image
+	uintptr_t pg0_phys;
+	uintptr_t pg1_phys;
+	PTE_t* pg0 = (PTE_t*)bvmalloc_p(sizeof(uint32_t) * PTRS_PER_PTE, &pg0_phys);
+	PTE_t* pg1 = (PTE_t*)bvmalloc_p(sizeof(uint32_t) * PTRS_PER_PTE, &pg1_phys);
+	memset(pg0, 0, sizeof(uint32_t) * PTRS_PER_PTE);
+	memset(pg1, 0, sizeof(uint32_t) * PTRS_PER_PTE);
 
-	// Set bits 31 and 16 in CR0 to enable paging and write protect respectively
+	// Create a linear mapping of 0-8 MiB, 4 MiB per table.
+	// NOTE: Because pg1 is allocated immediately after pg0 using the boot
+	//  allocator, and both have the size of one page, we can overflow into pg1
+	//  from pg0. This is why we iterate `PTRS_PER_PTE*2` times.
+	for (int i = 0; i < PTRS_PER_PTE * 2; ++i) {
+		pg0[i].present = 1; // This page points to a frame
+		pg0[i].global  = 1; // Accessible anywhere, and shouldn't change
+		pg0[i].addr    = i; // The frame physical address / PAGE_SIZE
+
+		// Check where this address falls in kernel image for read-write perms
+		uintptr_t paddr = i << PAGE_SHIFT;
+		if (paddr < (uintptr_t)&kernel_addr) {
+			// Real-mode address space before kernel image. Contains some BIOS
+			//  data that we need to write to for VGA.
+			pg0[i].rw = 1;
+		} else if (paddr < (uintptr_t)&code_end_addr) {
+			// This is the multiboot header, .text region, and .rodata region.
+			pg0[i].rw = 0;
+			kprintf("Frame starting at 0x%p set as read-only.\n", paddr);
+		} else if (paddr < (uintptr_t)&kernel_end_addr) {
+			// This is the .data and .bss regions. Need to be able to write.
+			pg0[i].rw = 1;
+		} else {
+			// Anything else after the kernel image. This includes the page
+			//  tables, so mark as read-write.
+			pg0[i].rw = 1;
+		}
+	}
+
+	// Map pg0 and pg1 to the beginning of kernel-space, as well as set up an
+	//  identity mapping so we can enable paging without breaking code pointer
+	// Kernel-space mapping (vaddr = paddr + PAGE_OFFSET)
+	uint32_t start_pfn = PAGE_OFFSET >> PGDIR_SHIFT;
+	pgd[start_pfn].present   = 1;
+	pgd[start_pfn].addr      = (uint32_t)pg0 >> PAGE_SHIFT;
+	pgd[start_pfn+1].present = 1;
+	pgd[start_pfn+1].addr    = (uint32_t)pg1 >> PAGE_SHIFT;
+	// Identity mapping (vaddr = paddr)
+	pgd[0].present = 1;
+	pgd[0].addr    = (uint32_t)pg0 >> PAGE_SHIFT;
+	pgd[1].present = 1;
+	pgd[1].addr    = (uint32_t)pg1 >> PAGE_SHIFT;
+
+	// Set the CR3 page directory address to our global page directory. Then
+	//  enable paging using CR0 register with write protect.
+	// NOTE: Don't need any CR3 flags (bit 3 for PWT, bit 4 for PCD).
+	uint32_t cr3 = (uint32_t)pgd;
+	asm volatile ("mov %0, %%cr3" : : "r"(cr3)); // Set page directory address
 	uint32_t cr0;
 	asm volatile ("mov %%cr0, %0" : "=r"(cr0));
-	cr0 |= 0x80010000;
-	asm volatile ("mov %0, %%cr0" : : "r"(cr0));
+	cr0 |= 0x80010000; // Bit 31 for paging, bit 16 for write protect
+	asm volatile ("mov %0, %%cr0" : : "r"(cr0)); // Enable paging/write protect
 
-	// NOTE: May need to force a TLB flush so our paging changes work properly.
-	uint32_t temp;
-	asm volatile ("mov %%cr3, %0" : "=r"(temp));
-	asm volatile ("mov %0, %%cr3" : : "r"(temp));
-
-	// Since paging is now enabled, VGA memory needs to be addressed with
-	//  PAGE_OFFSET added.
+	// Update the VGA memory address so we use the virtual address
 	kernel_kprintf_update_page_offset(PAGE_OFFSET);
 
-	// NOTE: Load-bearing kprintf... for some reason if this isn't called,
-	//  the identity mapping can't be removed.
-	kprintf("");
-
-	// We no longer need the kernel image identity mapping since paging is now
-	//  functioning! We can unmap now
-	// TODO: This *doesn't* work when running via VirtualBox. Unsure why, but
-	//  it seems to cause a triple page fault
-	page_directory[0].present = 0;
-	page_directory[0].addr    = 0;
-	page_directory[1].present = 0;
-	page_directory[1].addr    = 0;
+	// Paging is now set up, rid outselves of the identity mapping and
+	//  invalidate those addresses.
+	pgd[0].present = 0;
+	pgd[0].addr = 0;
+	pgd[1].present = 0;
+	pgd[1].addr = 0;
+	invlpg(0 << PAGE_SHIFT);
+	invlpg(1 << PAGE_SHIFT);
 }

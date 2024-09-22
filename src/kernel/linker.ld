@@ -6,29 +6,30 @@ phys = 0x00100000;
 SECTIONS {
 	/* Actual code */
 	.text phys : AT(phys) {
-		code_addr = .;
+		kernel_addr = .;
 		*(.multiboot.header)
 		*(.text)
 		*(.rodata)
 		. = ALIGN(4096);
+		code_end_addr = .;
 	}
 
 	/* Kernel data */
-	.data : AT(phys + (data_addr - code_addr)) {
+	.data : AT(phys + (data_addr - kernel_addr)) {
 		data_addr = .;
 		*(.data)
 		. = ALIGN(4096);
 	}
 
 	/* Statically defined, uninitialised values */
-	.bss : AT(phys + (bss_addr - code_addr)) {
+	.bss : AT(phys + (bss_addr - kernel_addr)) {
 		bss_addr = .;
 		*(.bss)
 		. = ALIGN(4096);
 	}
 
 	/* End of kernel */
-	end_addr = .;
+	kernel_end_addr = .;
 
 	/* Get rid of unnecessary GCC bits */
 	/DISCARD/ : {

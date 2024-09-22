@@ -1,249 +1,242 @@
-/// @file memory.h
+
 
 #ifndef _KERNEL_MEMORY_H
 #define _KERNEL_MEMORY_H 1
 
 #include <stdint.h>
-#include <stddef.h>
-#include <kernel/multiboot.h> // multiboot_info_t
-#include <kernel/system.h>
 
-// Where the kernel is placed
+#include <kernel/atomic.h>
+// #include <kernel/list.h>
+#include <kernel/multiboot.h>
+
+
+// NOTE: When caching becomes an issue for speed, the order of a lot of the
+//  struct attributes will have to be shuffled around.
+
+
+// Where kernel-space begins in memory
 #define PAGE_OFFSET 0xC0000000
 
-// Sizes and offsets of memory zones in kernel space
-#define ZONE_DMA_OFFSET     0x00000000
-#define ZONE_DMA_SIZE       0x01000000 // First 16 MiB of memory
-#define ZONE_NORMAL_OFFSET  0x01000000
-#define ZONE_NORMAL_SIZE    0x37000000 // 16 MiB - 896 MiB
-#define ZONE_HIGHMEM_OFFSET 0x38000000
-#define ZONE_HIGHMEM_SIZE   0x08000000 // 896 MiB - End
-
-// Page sizes
-#define PAGE_STRUCTURE_SIZE 4096 // Size in bytes of a directory/table
-#define PAGE_ENTRY_COUNT    1024 // How many entries per directory/table
-#define PAGE_FRAME_SIZE     4096 // Size of physical memory an entry points to
+// Method for invalidating TLB for a physical address
+static inline void invlpg(uintptr_t paddr) {
+	asm volatile ("invlpg (%0)" : : "r"(paddr) : "memory");
+}
 
 
-// Representation of the CR3 register
-union CR3_register {
-	struct {
-		// Ignored
-		uint32_t ignored_1:3; // Bits 0-2
 
-		// Page-level write-through; indirectly determines the memory type used to
-		//  access the page directory during linear-address translation.
-		uint32_t pwt:1; // Bit 3
+// This represents a physical page frame in memory.
+struct phys_page {
+	// Backpointer to the zone this frame belongs to
+	struct mem_zone* zone;
 
-		// Page-level cache-disable; indirectly determines the memory type used to
-		//  access the page directory during linear-address translation.
-		uint32_t pcd:1; // Bit 4
+	// Reference count. If this drops to 0, this page may be freed.
+	atomic_t count;
 
-		// Ignored
-		uint32_t ignored_2:7; // Bits 5-11
-
-		// Physical address of the 4-KiB aligned page directory used for linear-
-		//  address translation
-		uint32_t addr:20; // Bits 12-31
+	// Flags for this page
+	union flags {
+		uint32_t raw;
+		// TODO: Struct for each flag
 	};
-	uint32_t raw;
-} __attribute__((packed));
-typedef union CR3_register CR3_register_t;
 
-// Page Directory Entry
-union page_PDE {
-	struct {
-		// Present; must be 1 to reference a page table
-		uint32_t present:1; // Bit 0
+	// If this frame is mapped into the kernel, this is the virtual address
+	void* virtual;
 
-		// Read/write; if 0, writes may not be allowed to the 4-MiB region
-		//  controlled by this entry
-		uint32_t rw:1; // Bit 1
+	// TODO: Attributes for when we set up slab allocator
+	// TODO: Attributes for when we set up swapping
+};
+typedef struct phys_page phys_page_t;
 
-		// User/supervisor; if 0, user-mode accesses are not allowed to the 4-MiB
-		//  region controlled by this entry
-		uint32_t user:1; // Bit 2
+// Global memory map, sits after kernel image. Pointers to all physical pages in
+//  the system.
+extern phys_page_t* mem_map;
 
-		// Page-level write-through; indirectly determines the memory type used to
-		//  access the page table referenced by this entry.
-		uint32_t pwt:1; // Bit 3
 
-		// Page-level cache disable; indirectly determines the memory type used to
-		//  access the page table referenced by this entry
-		uint32_t pcd:1; // Bit 4
 
-		// Accessed; indicates whether this entry has been used for linear-address
-		//  translation
-		uint32_t accessed:1; // Bit 5
+// A zone represents a partition of a node. It's a range within memory.
+//  This can be of three types: ZONE_DMA, ZONE_NORMAL, ZONE_HIGHMEM
+struct mem_zone {
+	// Backpointer to the node this zone is for
+	struct mem_node* node;
 
-		// Ignored
-		uint32_t ignored_1:1; // Bit 6
+	// C string for the name of the zone: "DMA", "Normal", "HighMem"
+	char* name;
 
-		// If CR4.PSE = 1, must be 0 (otherwise, this entry maps a 4-MiB page);
-		//  otherwise, ignored.
-		uint32_t page_size:1; // Bit 7
+	// Pointer to the array of physical frames in this zone. It should be stored
+	//  somewhere in the global `mem_map`.
+	phys_page_t* phys_pages;
+	uint32_t nb_phys_pages; // And total number of page frames in the node
+	uint32_t free_pages; // Number of free pages in the zone
 
-		// Ignored
-		uint32_t ignored_2:4; // Bits 8 - 11
+	// `start_pfn` is the first page frame number for this zone, and
+	//  `start_map_pfn` is the page offset within the global `mem_map`.
+	uint32_t start_pfn;
+	uint32_t start_map_pfn;
 
-		// Physical address of the 4-KiB aligned page table referenced by this entry
-		uint32_t addr:20; // Bits 12 - 31
-	};
-	uint32_t raw;
-} __attribute__((packed));
-typedef union page_PDE PDE_t;
+	// TODO: Zone watermarks, for swapping.
+};
+typedef struct mem_zone mem_zone_t;
 
-// 4 MiB Page Directory Entry (currently unused)
-struct page_PDE_4MB {
-	// Present; must be 1 to map to a 4-MiB page
-	uint32_t present:1; // Bit 0
+// Zones available on this OS
+#define ZONE_DMA     0
+#define ZONE_NORMAL  1
+#define ZONE_HIGHMEM 2
+#define MAX_NB_ZONES 3
 
-	// Read/write; if 0, writes may not be allowed to the 4-MiB page referenced
-	//  by this entry.
-	uint32_t rw:1; // Bit 1
+// Null delimited list of zones
+struct mem_zone_list {
+	mem_zone_t* zones[MAX_NB_ZONES + 1];
+};
+typedef struct mem_zone_list mem_zone_list_t;
 
-	// User/supervisor; if 0, user-mode accesses are not allowed to the 4-MiB
-	//  page referenced by this entry.
-	uint32_t user:1; // Bit 2
 
-	// Page-level write-through; indirectly determines the memory type used to
-	//  access the 4-MiB page referenced by this entry.
-	uint32_t pwt:1; // Bit 3
 
-	// Page-level cache disable; indirectly determines the memory type used to
-	//  access the 4-MiB page referenced by this entry.
-	uint32_t pcd:1; // Bit 4
+// A node represents a set of memory available on the machine.
+struct mem_node {
+	// NID of this node. First node should be 0.
+	int32_t node_id;
 
-	// Accessed; indicates whether software has accessed the 4-MiB page
-	//  referenced by this entry
-	uint32_t accessed:1; // Bit 5
+	// `zones` is a list of all zones that *could* be present on a node. Not all
+	//  of them m ay be present, but they're all defined.
+	// `zonelist` is a list of *actual* zones present for this node, in order of
+	//  preferred allocations.
+	mem_zone_t zones[MAX_NB_ZONES];
+	mem_zone_list_t zonelist;
 
-	// Dirty; indicates whether software has written to the 4-MiB page
-	//  referenced by this entry
-	uint32_t dirty:1; // Bit 6
+	// Pointer to the array of physical frames in this node. It should be stored
+	//  somewhere in the global `mem_map`.
+	phys_page_t* phys_pages;
+	uint32_t nb_phys_pages; // And total number of page frames in the node
 
-	// Page size; must be 1 (otherwise, this entry references a page table)
-	uint32_t page_size:1; // Bit 7
+	// `start_pfn` is the first page frame number for this node (ideally 0).
+	// `start_map_pfn` is the page offset within the global `mem_map`. This may
+	//  be different from `start_pfn` for nodes other than the first.
+	uint32_t start_pfn;
+	uint32_t start_map_pfn;
 
-	// Global; if CR4.PGE = 1, determines whether the translation is global;
-	//  ignored otherwise.
-	uint32_t global:1; // Bit 8
+	// Bitmap describing any holes in memory. May be useful for ISA memhole.
+	uint32_t* valid_addr_bitmap;
 
-	// Ignored
-	uint32_t ignored_1:3; // Bits 9 - 11
+	// Pointer to the next node on the system. Will be NULL if this is the last
+	//  one.
+	struct mem_node* next;
+};
+typedef struct mem_node mem_node_t;
 
-	// If the PAT is supported, indirectly determines the memory type used to
-	//  access the 4-MiB page referenced by this entry; otherwise, reserved
-	//  (must be 0).
-	uint32_t pat:1; // Bit 12
+// Global list of all nodes on the system
+#define MAX_NB_MEM_NODES 1
+extern mem_node_t mem_nodes[MAX_NB_MEM_NODES];
 
-	// Bits 39:32 of physical address of the 4-MiB page referenced by this entry
-	uint32_t addr_upper:8; // Bits 13-20
-	// NOTE: Assuming MAXPHYSADDR = 40
 
-	// Reserved (must be 0)
-	uint32_t reserved:1; // Bit 14
-	// NOTE: Assuming MAXPHYSADDR = 40
-
-	// Bits 31:22 of physical address of the 4-MiB page referenced by this entry
-	uint32_t addr_lower:10; // Bits 22-31
-} __attribute__((packed));
-// TODO: Typedef for PDE_4MB
 
 // Page Table Entry
 union page_PTE {
-	struct {
-		// Present; must be 1 to map to a 4-KiB page
-		uint32_t present:1; // Bit 0
-
-		// Read/write; if 0, writes may not be allowed to the 4-KiB page referenced
-		//  by this entry
-		uint32_t rw:1; // Bit 1
-
-		// User/supervisor; if 0, user-mode accesses are not allowed to the 4-KiB
-		//  page referenced by this entry.
-		uint32_t user:1; // Bit 2
-
-		// Page-level write-through; indirectly determines the memory type used to
-		//  access the 4-KiB page referenced by this entry.
-		uint32_t pwt:1; // Bit 3
-
-		// Page-level cache disable; indirectly determines the memory type used to
-		//  access the 4-KiB page referenced by this entry.
-		uint32_t pcd:1; // Bit 4
-
-		// Accessed; indicates whether software has accessed the 4-KiB page
-		//  referenced by this entry
-		uint32_t accessed:1; // Bit 5
-
-		// Dirty; indicates whether software has written to the 4-KiB page
-		//  referenced by this entry
-		uint32_t dirty:1; // Bit 6
-
-		// If the PAT is supported, indirectly determines the memory type used to
-		//  access the 4-KiB page referenced by this section; otherwise, reserved
-		//  (must be 0)
-		uint32_t pat:1; // Bit 7
-
-		// Global; if CR4.PGE = 1, determines whether the translation is global;
-		//  ignored otherwise
-		uint32_t global:1; // Bit 8
-
-		// Ignored
-		uint32_t ignored:3; // Bits 9 - 11
-
-		// Physical address of the 4-KiB page referenced by this entry
-		uint32_t addr:20; // Bits 12 - 31
-	};
 	uint32_t raw;
+	struct {
+		// Bit 0, Present; Must be 1 to map to 4-KiB page
+		uint32_t present:1;
+
+		// Bit 1, Read/write; If 0, writes are not allowed to the 4 KiB region
+		uint32_t rw:1;
+
+		// Bit 2, User/supervisor; If 0, user-mode access not allowed to the
+		//  4 KiB region
+		uint32_t user:1;
+
+		// Bit 3, Page-level write-through (PWT)
+		uint32_t pwt:1;
+
+		// Bit 4, Page-level cache disable (PCD)
+		uint32_t pcd:1;
+
+		// Bit 5, Accessed; Indicates whether software has accessed the 4 KiB
+		//  page referenced by this entry
+		uint32_t accessed:1;
+
+		// Bit 6, Dirty; Indicates whether software has written to the 4 KiB
+		//  page referenced by this entry
+		uint32_t dirty:1;
+
+		// Bit 7, PAT; If PAT not supported, must be 0
+		uint32_t page_size:1;
+
+		// Bit 8, Global; If CR4.PGE = 1, determines whether the translation is
+		//  global. Ignored otherwise
+		uint32_t global:1;
+
+		// Bits 9 - 11, Ignored
+		uint32_t ignored_9_11:3;
+
+		// Bits 12 - 31, Physical address of referenced 4 KiB page frame
+		uint32_t addr:20;
+	};
 } __attribute__((packed));
 typedef union page_PTE PTE_t;
 
+#define PAGE_SHIFT 12
+#define PAGE_SIZE  (1UL << PAGE_SHIFT)
+#define PAGE_MASK  (~(PAGE_SIZE-1))
+#define PAGE_ALIGN(addr) (((addr) + PAGE_SIZE - 1) & PAGE_MASK)
+#define PTRS_PER_PTE 1024 // Entries per table
+
+// TODO: 4 MiB Page Directory Entry (if PSE enabled)
+
+// Page Directory Entry
+union page_PDE {
+	uint32_t raw;
+	struct {
+		// Bit 0, Present; Must be 1 to reference a page table
+		uint32_t present:1;
+
+		// Bit 1, Read/write; If 0, writes are not allowed to the 4 MiB region
+		uint32_t rw:1;
+
+		// Bit 2, User/supervisor; If 0, user-mode access not allowed to the
+		//  4 MiB region
+		uint32_t user:1;
+
+		// Bit 3, Page-level write-through (PWT)
+		uint32_t pwt:1;
+
+		// Bit 4, Page-level cache disable (PCD)
+		uint32_t pcd:1;
+
+		// Bit 5, Accessed; Indicates whether this entry has been used for
+		//  linear-address translation
+		uint32_t accessed:1;
+
+		// Bit 6, Ignored
+		uint32_t ignored_6:1;
+
+		// Bit 7, If PSE enabled, 1 maps to a 4 MiB page, 0 maps to a page
+		//  table. If PSE disabled, ignored.
+		uint32_t page_size:1;
+
+		// Bits 8 - 11, Ignored
+		uint32_t ignored_8_11:4;
+
+		// Bits 12 - 31, Physical address of referenced page table
+		uint32_t addr:20;
+	};
+} __attribute__((packed));
+typedef union page_PDE PDE_t;
+
+#define PGDIR_SHIFT 22
+#define PGDIR_SIZE  (1UL << PGDIR_SHIFT)
+#define PGDIR_MASK  (~(PGDIR_SIZE-1))
+#define PTRS_PER_PDE 1024 // Entries per directory
+
+// Pointer to the current Page Global Directory (PGD)
+extern PDE_t* pgd;
 
 
-// Pointer to the start of free low memory in kernel-space
-extern uintptr_t placement_pointer;
 
-// Pointer to kernel page directory, and current page directory. Both in the
-//  style CR3 expects as an address
-extern uintptr_t kernel_page_directory;
-extern uintptr_t current_page_directory;
+// Sets up nodes on the system
+void memory_node_setup(multiboot_info_t* mb_info);
 
-// TODO: Heap?
-extern uintptr_t heap_end;
+// Sets up paging on the system
+void memory_paging_setup();
 
 
 
-// Allocates a block
-extern uintptr_t kmalloc(size_t size);
-
-// Allocates an aligned block
-extern uintptr_t kvmalloc(size_t size);
-
-// Allocates a block at physical address
-extern uintptr_t kmalloc_p(size_t size, uintptr_t* phys);
-
-// Allocates an aligned block at physical address
-extern uintptr_t kvmalloc_p(size_t size, uintptr_t* phys);
-
-// Allocates a block at physical address if heap not set up
-extern uintptr_t kmalloc_real(size_t size, int align, uintptr_t* phys);
-
-// Sets the @ref placement_pointer
-extern void kmalloc_startat(uintptr_t address);
-
-
-
-
-
-
-// Sets up paging, and enables on the CPU
-extern void setup_paging(multiboot_info_t* mb_info);
-
-// Fetches a page given the virtual address
-extern PTE_t* get_page(void* address);
-
-// Translates virtual address to physical address
-extern uintptr_t translate_virtual_address(void* address);
 
 #endif

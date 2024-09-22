@@ -19,10 +19,6 @@
 # See https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Header-layout
 
 
-# Some external references
-.extern code_addr, data_addr, bss_addr, end_addr
-
-
 # Kernel entry point
 .section .text
 .global _start

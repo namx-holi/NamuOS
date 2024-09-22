@@ -141,6 +141,10 @@ int kernel_setup_kprintf(multiboot_info_t* mb_info) {
 
 void kernel_kprintf_update_page_offset(uintptr_t add) {
 	EGA_MEMORY_ADDR = (uint16_t*)((uintptr_t)EGA_MEMORY_ADDR + add);
+
+	// FIXME: Load-bearing print... for some reason if this isn't called, the
+	//  paging identity mapping in `memory_paging_setup` can't be removed.
+	kprintf("\r");
 }
 
 
