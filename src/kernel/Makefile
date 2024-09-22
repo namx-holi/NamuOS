@@ -1,8 +1,8 @@
 ASM=i686-elf-gcc
-ASM_FLAGS=-O0 -g -ffreestanding -Wall -Wextra
+ASM_FLAGS=-O2 -g -ffreestanding -Wall -Wextra
 
 CC=i686-elf-gcc
-CC_FLAGS=-std=gnu11 -O0 -g -ffreestanding -Wall -Wextra
+CC_FLAGS=-std=gnu11 -O2 -g -ffreestanding -Wall -Wextra
 
 AR=i686-elf-ar
 AR_FLAGS=
