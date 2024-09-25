@@ -20,8 +20,8 @@ static size_t EGA_WIDTH = 0;
 static size_t EGA_HEIGHT = 0;
 static uint16_t* EGA_MEMORY_ADDR = (uint16_t*)0;
 static uint8_t EGA_COLOUR;
-static const enum vga_colour EGA_DEFAULT_FG = VGA_COLOUR_LIGHT_GREY;
 static const enum vga_colour EGA_DEFAULT_BG = VGA_COLOUR_BLACK;
+static const enum vga_colour EGA_DEFAULT_FG = VGA_COLOUR_LIGHT_GREY;
 void ega_boundscheck();
 
 
@@ -55,7 +55,6 @@ int kprintf(const char* restrict format, ...) {
 	va_end(vlist);
 	return retval;
 }
-
 
 int kvprintf(const char* restrict format, va_list vlist) {
 	// Count bytes written
@@ -113,7 +112,6 @@ int kvprintf(const char* restrict format, va_list vlist) {
 	return written;
 }
 
-
 int kernel_setup_kprintf(multiboot_info_t* mb_info) {
 	// TODO: Handle other modes
 	// https://en.wikipedia.org/wiki/VESA_BIOS_Extensions
@@ -130,10 +128,16 @@ int kernel_setup_kprintf(multiboot_info_t* mb_info) {
 			EGA_WIDTH = mb_info->framebuffer_width;
 			EGA_HEIGHT = mb_info->framebuffer_height;
 			EGA_MEMORY_ADDR = VIDEO_MEMORY_ADDR_COLOUR; // TODO: Need to check if monochrome?
-			EGA_COLOUR = (EGA_DEFAULT_BG | EGA_DEFAULT_FG);
+			EGA_COLOUR = (EGA_DEFAULT_BG<<4 | EGA_DEFAULT_FG);
 		}; break;
 
 		default: return -2;
+	}
+
+	// Clear the screen with the default colour
+	uint32_t total_entry_count = EGA_WIDTH * EGA_HEIGHT;
+	for (uint32_t i = 0; i < total_entry_count; ++i) {
+		EGA_MEMORY_ADDR[i] = ((vga_entry_t)EGA_COLOUR) << 8 | (vga_entry_t)' ';
 	}
 
 	return 0; // success
@@ -207,11 +211,21 @@ void ega_boundscheck() {
 	// If we reached the end of the screen, scroll everything up one line so we
 	//  can continue printing at the bottom.
 	if (next_row >= EGA_HEIGHT) {
-		next_row = EGA_HEIGHT - 1; // Reset back to the last line
+		// Reset back to the last line so we can continue printing at the bottom
+		--next_row;
 
-		// Shift everything up by one line
-		uint32_t char_count = EGA_WIDTH * (EGA_HEIGHT - 1);
-		memmove((void*)EGA_MEMORY_ADDR, (void*)(EGA_MEMORY_ADDR + EGA_WIDTH), char_count*2); // x2 for uint16
+		// Shift everything we've printed so far back one line
+		uint32_t copied_entry_count = EGA_WIDTH * (EGA_HEIGHT - 1);
+		memmove(
+			(void*)EGA_MEMORY_ADDR, // Moving to here
+			(void*)EGA_MEMORY_ADDR + EGA_WIDTH*2, // From here
+			copied_entry_count*2 // This many bytes. Each VGA entry is 2 bytes.
+		);
+
+		// Clear the bottom line with empty characters
+		for (uint32_t i = 0; i < EGA_WIDTH; ++i) {
+			EGA_MEMORY_ADDR[copied_entry_count + i] = ((vga_entry_t)EGA_COLOUR) << 8 | (vga_entry_t)' ';
+		}
 	}
 	#else
 	// If we reached end of screen, move to top of screen
