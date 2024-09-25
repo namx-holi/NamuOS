@@ -190,6 +190,10 @@ int _kprint_char(char ch) {
 	return 1; // One character printed, successful!
 }
 
+// NOTE: Something about optimising this bit breaks
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+#define _KPRINTF_SCROLLING_ENABLED 1
 void ega_boundscheck() {
 	// TODO: Handle scrolling down?
 
@@ -199,10 +203,23 @@ void ega_boundscheck() {
 		++next_row;
 	}
 
+	#if _KPRINTF_SCROLLING_ENABLED
+	// If we reached the end of the screen, scroll everything up one line so we
+	//  can continue printing at the bottom.
+	if (next_row >= EGA_HEIGHT) {
+		next_row = EGA_HEIGHT - 1; // Reset back to the last line
+
+		// Shift everything up by one line
+		uint32_t char_count = EGA_WIDTH * (EGA_HEIGHT - 1);
+		memmove((void*)EGA_MEMORY_ADDR, (void*)(EGA_MEMORY_ADDR + EGA_WIDTH), char_count*2); // x2 for uint16
+	}
+	#else
 	// If we reached end of screen, move to top of screen
 	if (next_row >= EGA_HEIGHT)
 		next_row = 0;
+	#endif
 }
+#pragma GCC pop_options
 
 
 
