@@ -14,7 +14,7 @@ static uintptr_t esp; // Stack pointer
 void kernel_main(multiboot_info_t* mb_info, uint32_t magic, uintptr_t mb_esp) {
 	esp = mb_esp; // Save the stack pointer
 
-	// Want to use kprintf
+	// Set up kprintf for VGA output
 	if (kernel_setup_kprintf(mb_info) < 0) abort();
 
 	// Check if we have the correct multiboot header magic
@@ -25,9 +25,11 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t magic, uintptr_t mb_esp) {
 	kprintf("mem_lower = %d KiB\n", mb_info->mem_lower);
 	kprintf("mem_upper = %d KiB\n", mb_info->mem_upper);
 
-	// TODO: Also set up nodes/zones
 	memory_paging_setup();
 	kprintf("Paging successfully initialised!\n");
+	memory_node_setup(mb_info);
+	kprintf("Memory nodes successfully initialised!\n");
 
+	kprintf("Finished running kernel_main, aborting...\n");
 	abort();
 }
