@@ -152,48 +152,6 @@ void kernel_kprintf_update_page_offset(uintptr_t add) {
 }
 
 
-int _kprint_char(char ch) {
-	// TODO: Check global mode. Assuming EGA currently
-
-	// Special characters
-	switch (ch) {
-		case '\n': // Line feed (newline)
-			++next_row;
-			next_col = 0;
-			ega_boundscheck();
-			return 1; // One character printed, successful!
-		
-		case '\f': // Form feed
-			++next_row; // Handle same as '\v'
-			ega_boundscheck();
-			return 1; // One character printed, successful!
-		
-		case '\r': // Carriage return
-			next_col = 0;
-			return 1; // One character printed, successful!
-		
-		case '\t': // Horizontal tab
-			next_col += EGA_TAB_WIDTH - (next_col % EGA_TAB_WIDTH);
-			ega_boundscheck();
-			return 1; // One character printed, successful!
-		
-		case '\v': // Vertical tab
-			++next_row;
-			ega_boundscheck();
-			return 1; // One character printed, successful!
-	}
-
-	// Normal character
-	const size_t index = next_row * EGA_WIDTH + next_col;
-	EGA_MEMORY_ADDR[index] = (vga_entry_t)EGA_COLOUR << 8 | (vga_entry_t)ch;
-	
-	// Move to next position
-	++next_col;
-	ega_boundscheck();
-
-	return 1; // One character printed, successful!
-}
-
 // NOTE: Something about optimising this bit breaks
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
@@ -236,6 +194,47 @@ void ega_boundscheck() {
 #pragma GCC pop_options
 
 
+int _kprint_char(char ch) {
+	// TODO: Check global mode. Assuming EGA currently
+
+	// Special characters
+	switch (ch) {
+		case '\n': // Line feed (newline)
+			++next_row;
+			next_col = 0;
+			ega_boundscheck();
+			return 1; // One character printed, successful!
+		
+		case '\f': // Form feed
+			++next_row; // Handle same as '\v'
+			ega_boundscheck();
+			return 1; // One character printed, successful!
+		
+		case '\r': // Carriage return
+			next_col = 0;
+			return 1; // One character printed, successful!
+		
+		case '\t': // Horizontal tab
+			next_col += EGA_TAB_WIDTH - (next_col % EGA_TAB_WIDTH);
+			ega_boundscheck();
+			return 1; // One character printed, successful!
+		
+		case '\v': // Vertical tab
+			++next_row;
+			ega_boundscheck();
+			return 1; // One character printed, successful!
+	}
+
+	// Normal character
+	const size_t index = next_row * EGA_WIDTH + next_col;
+	EGA_MEMORY_ADDR[index] = (vga_entry_t)EGA_COLOUR << 8 | (vga_entry_t)ch;
+	
+	// Move to next position
+	++next_col;
+	ega_boundscheck();
+
+	return 1; // One character printed, successful!
+}
 
 int _kprint_uint(uint64_t x) {
 	int written = 0; // Keep track of numbers of chars written
