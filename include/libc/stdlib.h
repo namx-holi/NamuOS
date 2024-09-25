@@ -73,7 +73,7 @@
  * 
  * @see @ref free @copybrief free
 */
-extern void* malloc(size_t size);
+extern void* malloc(size_t size) __attribute__((malloc));
 
 /** @brief Allocates and zeroes memory
  * 
@@ -123,13 +123,13 @@ extern void* malloc(size_t size);
  * }
  * ```
 */
-extern void* calloc(size_t num, size_t size);
+extern void* calloc(size_t num, size_t size) __attribute__((malloc));
 
 /** @brief Expands previously allocated memory block
  * 
  * @todo Detailed description
 */
-extern void* realloc(void* ptr, size_t new_size);
+extern void* realloc(void* ptr, size_t new_size) __attribute__((malloc));
 
 /** @brief Deallocates previously allocated memory block
  * 
@@ -153,7 +153,7 @@ extern void free_aligned_sized(void* ptr, size_t alignment, size_t size);
  * 
  * @todo Detailed description
 */
-extern void* aligned_alloc(size_t alignment, size_t size);
+extern void* aligned_alloc(size_t alignment, size_t size) __attribute__((malloc));
 
 
 /************************************************/
