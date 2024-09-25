@@ -26,9 +26,7 @@ void kernel_main(multiboot_info_t* mb_info, uint32_t magic, uintptr_t mb_esp) {
 	kprintf("mem_upper = %d KiB\n", mb_info->mem_upper);
 
 	memory_paging_setup();
-	kprintf("Paging successfully initialised!\n");
-	memory_node_setup(mb_info);
-	kprintf("Memory nodes successfully initialised!\n");
+	memory_memmap_setup(mb_info);
 
 	kprintf("Finished running kernel_main, aborting...\n");
 	abort();
