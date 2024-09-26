@@ -6,17 +6,7 @@
 // Boot allocation starts immediately after the end of kernel image.
 //  `placement_pointer` is a physical address.
 extern void* kernel_end_addr;
-uintptr_t placement_pointer = (uintptr_t)&kernel_end_addr;
-
-/**
- * Boot allocator.
- * 
- * Allocates memory without setting frame bitmap or paging. If this needs to be
- * done, must be done manually after allocation.
-*/
-uintptr_t boot_malloc(size_t size, int align, uintptr_t* paddr_ptr);
-
-
+volatile uintptr_t placement_pointer = (uintptr_t)&kernel_end_addr;
 
 uintptr_t kmalloc(size_t size) {
 	return kmalloc_real(size, 0, NULL); // Not aligned, no paddr
@@ -35,40 +25,50 @@ uintptr_t kvmalloc_p(size_t size, uintptr_t* paddr_ptr) {
 }
 
 uintptr_t kmalloc_real(size_t size, int align, uintptr_t* paddr_ptr) {
-	// We may need the physical address anyway, so we keep our own copy
-	uintptr_t paddr;
-	uintptr_t vaddr = boot_malloc(size, align, &paddr);
-	
-	// If paging is set up, paddr is PAGE_OFFSET behind virtual address
-	if (pgd != NULL)
-		paddr -= PAGE_OFFSET;
-
-	// TODO: Handle page creation
-	// TODO: Handle bitmap updating
-
-	// If we need to return paddr, set the given pointer
-	if (paddr_ptr)
-		*paddr_ptr = paddr;
-
-	// Return the virtual address of the allocation
-	return vaddr;
-}
-
-uintptr_t boot_malloc(size_t size, int align, uintptr_t* paddr_ptr) {
 	// If asked to align, move to the next page boundary
 	if (align)
 		placement_pointer = PAGE_ALIGN(placement_pointer);
-	
-	// If given a physical address pointer, set it to where this allocation
-	//  takes place
+
+	// The virtual address for the allocation is where the placement pointer
+	//  currently sits, and the physical address is where in physical memory
+	//  that allocated area sits. The physical address will be offset by
+	//  PAGE_OFFSET if paging is enabled.
+	uintptr_t vaddr = placement_pointer;
+	uintptr_t paddr = placement_pointer;
+
+	// If the end of the allocation isn't paged yet, we need to set up paging to
+	//  at least the end of the allocation. Since we're still in kmalloc-space,
+	//  the mapping is linear.
+	if (pgd) {
+		// First, because paging is enabled, the physical address needs to be
+		//  shifted by the page offset
+		paddr -= PAGE_OFFSET;
+
+		// Extend the linear mapping to at least the end of allocation (plus any
+		//  page tables to do this). If this did end up allocating space for
+		//  page tables, we need to skip over those in our returned paddr and
+		//  vaddr.
+		uint32_t alloc_size = paging_extend_kmalloc_region(vaddr + size - 1);
+		vaddr += alloc_size;
+		paddr += alloc_size;
+	}
+
+	// If the memmap bitmap has been initialised, update frames as used.
+	if (memmap_bitmap) {
+		uint32_t start_pfn = paddr / PAGE_SIZE;
+		uint32_t end_pfn = (paddr + size) / PAGE_SIZE;
+		for (uint32_t pfn = start_pfn; pfn < end_pfn; ++pfn)
+			memmap_mark_used(pfn);
+	}
+
+	// If we were given a pointer, store the physical allocation address in it
 	if (paddr_ptr)
-		*paddr_ptr = placement_pointer;
-	
-	// Return the address of the start of allocation, and update placement
-	//  pointer for the next boot allocation
-	uintptr_t addr = placement_pointer;
+		*paddr_ptr = paddr;
+
+	// Move to where the next allocation can take place, and return the virtual
+	//  address of allocation!
 	placement_pointer += size;
-	return addr;
+	return vaddr;
 }
 
 void update_boot_allocator_for_paging() {

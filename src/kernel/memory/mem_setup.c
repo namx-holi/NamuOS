@@ -66,9 +66,11 @@ uint32_t get_nb_frames(multiboot_memory_map_t* mmap, uint32_t nb_entries) {
 }
 
 
-
+#define _MEMORY_PAGING_SETUP_LOG 0
 void memory_paging_setup() {
+	#if _MEMORY_PAGING_SETUP_LOG
 	kprintf("Setting up paging...\n");
+	#endif
 
 	// Allocate space for the kernel page directory. Each entry is one uint32.
 	uintptr_t pde_paddr;
@@ -77,7 +79,9 @@ void memory_paging_setup() {
 	for (uint32_t i = 0; i < PTRS_PER_PDE; ++i) {
 		pde[i].rw = 1; // Mark all pages as read/write
 	}
+	#if _MEMORY_PAGING_SETUP_LOG
 	kprintf("  Kernel PDE paddr is 0x%p\n", pde_paddr);
+	#endif
 
 	// Allocate space for 8 MiB worth of page tables to map the kernel image.
 	//  This should be enough for just setting up paging. Each entry is one
@@ -88,8 +92,10 @@ void memory_paging_setup() {
 	PTE_t* pg1 = (PTE_t*)kvmalloc_p(sizeof(uint32_t) * PTRS_PER_PTE, &pg1_paddr);
 	memset(pg0, 0, sizeof(uint32_t) * PTRS_PER_PTE); // Clear all entries
 	memset(pg1, 0, sizeof(uint32_t) * PTRS_PER_PTE); // Clear all entries
+	#if _MEMORY_PAGING_SETUP_LOG
 	kprintf("  Kernel PG0 paddr is 0x%p\n", pg0_paddr);
 	kprintf("  Kernel PG1 paddr is 0x%p\n", pg1_paddr);
+	#endif
 
 	// Map pg0 and pg1 to the first 8 MiB of physical memory, 4 MiB per table.
 	// NOTE: Because pg1 is allocated immediately after pg0 using the boot
@@ -164,12 +170,17 @@ void memory_paging_setup() {
 
 	// Now that paging is set up, we can set our global page directory!
 	pgd = pde;
+	#if _MEMORY_PAGING_SETUP_LOG
 	kprintf("  PGD set to kernel PDE\n");
 	kprintf("Paging successfully initialised!\n");
+	#endif
 }
 
+#define _MEMORY_MEMMAP_SETUP_LOG 1
 void memory_memmap_setup(multiboot_info_t* mb_info) {
+	#if _MEMORY_MEMMAP_SETUP_LOG
 	kprintf("Setting up memmap...\n");
+	#endif
 
 	// Since paging is enabled, we need to shift any address we have from the
 	//  multiboot structure by PAGE_OFFSET to access it
@@ -188,7 +199,9 @@ void memory_memmap_setup(multiboot_info_t* mb_info) {
 	// Using the helper function, find the total number of frames present on the
 	//  system.
 	uint32_t nb_frames = get_nb_frames(mmap, mmap_length);
+	#if _MEMORY_MEMMAP_SETUP_LOG
 	kprintf("  Total number of frames on system: %d (%d MiB)\n", nb_frames, nb_frames/256);
+	#endif
 
 	// Allocate space for the frame usage bitmap. Each byte can represent 8
 	//  frames, so we need nb_frames/8 bytes to represent every frame.
@@ -202,8 +215,10 @@ void memory_memmap_setup(multiboot_info_t* mb_info) {
 	uintptr_t bitmap_end_paddr = bitmap_paddr + nb_frames/8;
 	for (uint32_t pfn = 0; pfn < bitmap_end_paddr/PAGE_SIZE; ++pfn)
 		memmap_mark_used(pfn);
+	#if _MEMORY_MEMMAP_SETUP_LOG
 	kprintf("  Marked PFN 0x%x to 0x%x as used (%d frames) - may repeat...\n",
 		0, bitmap_end_paddr/PAGE_SIZE-1, bitmap_end_paddr/PAGE_SIZE);
+	#endif
 	
 	// TODO: Test if we've got the right frames here
 
@@ -223,7 +238,27 @@ void memory_memmap_setup(multiboot_info_t* mb_info) {
 		kprintf("  Marked PFN 0x%x to 0x%x as used (%d frames)\n",
 			start_pfn, end_pfn-1, end_pfn - start_pfn);
 	}
+
 	// TODO: Anything else?
+	// DEBUG: Try allocate 16 bytes per frame. This could be space for type (1),
+	//  flags (4), index (4), some other stuff (7)
+	kprintf("Allocating a test memmap...\n");
+	uintptr_t memmap_paddr;
+	char* memmap = (char*)kvmalloc_p(nb_frames * 16, &memmap_paddr);
+	kprintf("memmap paddr = 0x%p\n", memmap_paddr);
+	kprintf("memmap vaddr = 0x%p\n", memmap);
+
+	// See if we can set a value in this range after alloc
+	uintptr_t vaddr = (uintptr_t)memmap + nb_frames * 16 - 1;
+	kprintf("Fetching page for last byte (addr 0x%p)\n", vaddr);
+	PTE_t* page = get_page(vaddr);
+	kprintf("Page located at 0x%p\n", page);
+	kprintf("Page.present is %d\n", page->present);
+	kprintf("Page.addr is 0x%p\n", page->addr);
+	kprintf("Page.addr shifted is 0x%p\n", page->addr << PAGE_SHIFT);
+	memmap[nb_frames*16 - 1] = 1;
+
+	// TODO: Continue this
 
 	kprintf("memmap successfully initialised!\n");
 }

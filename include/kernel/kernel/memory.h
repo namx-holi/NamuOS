@@ -36,6 +36,15 @@ extern void update_boot_allocator_for_paging();
 // Sets up paging on the system
 extern void memory_paging_setup();
 
+// Gets a page if exists, or returns NULL if doesn't exist
+extern PTE_t* get_page(uintptr_t vaddr);
+
+// Extends the kmalloc region to at least given vaddr, in 4 MiB chunks. vaddr
+//  should be the last byte needed. Returns how much memory was allocated for
+//  paging.
+extern uint32_t paging_extend_kmalloc_region(uintptr_t vaddr);
+
+
 
 
 // Sets up frame bitmap
