@@ -23,11 +23,18 @@ static size_t next_col;
 #define EGA_TAB_WIDTH 4
 static size_t EGA_WIDTH = 0;
 static size_t EGA_HEIGHT = 0;
-static uint16_t* EGA_MEMORY_ADDR = (uint16_t*)0;
+volatile uint16_t* EGA_MEMORY_ADDR = (uint16_t*)0;
 static uint8_t EGA_COLOUR;
 static const enum vga_colour EGA_DEFAULT_BG = VGA_COLOUR_BLACK;
 static const enum vga_colour EGA_DEFAULT_FG = VGA_COLOUR_LIGHT_GREY;
 void ega_boundscheck();
+
+uint8_t kprint_get_colour() {
+	return EGA_COLOUR;
+}
+void kprint_set_colour(uint8_t colour) {
+	EGA_COLOUR = colour;
+}
 
 
 // Print helpers for format specifiers
@@ -309,7 +316,7 @@ int _kprint_valist_s(va_list* vlist) {
 	// Write string, and return length of string
 	int written = 0;
 	int i = 0;
-	int retval;
+	int retval = 0;
 	while (str[i] != '\0') {
 		retval = _kprint_char(str[i]);
 		if (retval < 0) return retval; // Pass errors up
@@ -320,6 +327,7 @@ int _kprint_valist_s(va_list* vlist) {
 }
 
 int _kprint_valist_p(va_list* vlist) {
+	// TODO: Always pad pointer digit to 8 hex digits
 	void* ptr = va_arg(*vlist, void*); // Printing pointer as uint hex
 	return _kprint_uint_hex((uint32_t)ptr);
 }

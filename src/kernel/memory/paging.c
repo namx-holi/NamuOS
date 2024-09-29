@@ -63,7 +63,6 @@ uint32_t paging_extend_kmalloc_region(uintptr_t vaddr) {
 		uintptr_t pg_paddr;
 		PTE_t* pg = (PTE_t*)kvmalloc_p(sizeof(uint32_t) * PTRS_PER_PTE, &pg_paddr);
 		memset(pg, 0, sizeof(uint32_t) * PTRS_PER_PTE); // Clear all entries
-		kprintf(" [*] Allocated new page for PDE 0x%x at 0x%p\n", pde_index, pg);
 
 		// Map 4 MiB to the new page table
 		for (uint32_t i = 0; i < PTRS_PER_PTE; ++i) {
@@ -91,7 +90,7 @@ uint32_t paging_extend_kmalloc_region(uintptr_t vaddr) {
 	// asm volatile ("mov %0, %%cr3" : : "r"(new_cr3));
 	// while(1){}
 
-	kprintf(" [*] Paging now spans to 0x%p\n", (pde_index << PGDIR_SHIFT) - 1);
+	kprintf(" [*] kmalloc linear mapping expanded to 0x%p\n", (pde_index << PGDIR_SHIFT) - 1);
 
 	// Return the extra space we allocated for page tables
 	return nb_page_tables * PAGE_SIZE;
