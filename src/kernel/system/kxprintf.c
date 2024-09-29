@@ -1,5 +1,10 @@
 /// @file kprint.c
 
+// Something about optimising this breaks everything. Could be addresses? Really
+//  unsure...
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+
 #include <kernel/system.h> // Implements
 
 #include <stdint.h> // uint types
@@ -152,9 +157,7 @@ void kernel_kprintf_update_page_offset(uintptr_t add) {
 }
 
 
-// NOTE: Something about optimising this bit breaks
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
+
 #define _KPRINTF_SCROLLING_ENABLED 1
 void ega_boundscheck() {
 	// TODO: Handle scrolling down?
@@ -191,8 +194,6 @@ void ega_boundscheck() {
 		next_row = 0;
 	#endif
 }
-#pragma GCC pop_options
-
 
 int _kprint_char(char ch) {
 	// TODO: Check global mode. Assuming EGA currently
@@ -347,3 +348,5 @@ int _kprint_valist_lx(va_list* vlist) {
 	uint64_t num = va_arg(*vlist, uint64_t); // Printing long uint as hex
 	return _kprint_uint_hex(num);
 }
+
+#pragma GCC pop_options
