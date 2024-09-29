@@ -145,7 +145,7 @@ void memory_paging_setup() {
 	// Enable paging (bit 31) and write protect (bit 16) with CR0 register
 	uint32_t cr0;
 	asm volatile ("mov %%cr0, %0" : "=r"(cr0)); // Copy current flags
-	cr0 |= 0x80000000; //0x80010000; // Set bits for paging and write protect
+	cr0 |= 0x80010000; // Set bits for paging and write protect
 	asm volatile ("mov %0, %%cr0" : : "r"(cr0));
 
 	// Update the VGA memory address so we use the new virtual address instead
