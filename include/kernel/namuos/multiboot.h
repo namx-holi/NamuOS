@@ -1,19 +1,28 @@
-/// @file multiboot.h Multiboot header file
+/**
+ * @file multiboot.h
+ * @defgroup namuos_multiboot <namuos/multiboot.h>
+ * @brief Structures for GRUB multiboot info
+ * @ingroup namuos
+ * 
+ * @todo Detailed description
+ * 
+ * @{
+*/
 
-#ifndef _MULTIBOOT_H
-#define _MULTIBOOT_H 1
+#ifndef _NAMUOS_MULTIBOOT_H
+#define _NAMUOS_MULTIBOOT_H 1
 
 #include <stdint.h>
 
 // Ref: https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Boot-information-format
 
 // TODO: Do we need other defines?
+// TODO: Method to fix addresses to virtual?
+// TODO: Doxygen comments
 
-#define MULTIBOOT_HEADER_MAGIC     0x1BADB002 // Header magic, starts with 1
-#define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002 // Bootloader magic, starts with 2
+#define MULTIBOOT_HEADER_MAGIC     0x1BADB002 ///< Header magic, starts with 1
+#define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002 ///< Bootloader magic, starts with 2
 
-// Skip if assembly
-#ifndef ASM_FILE
 
 // Multiboot module
 struct multiboot_module {
@@ -197,5 +206,15 @@ struct multiboot_info {
 typedef struct multiboot_info multiboot_info_t;
 
 
-#endif /* ASM_FILE */
-#endif /* _MULTIBOOT_H */
+/** @brief Fix all addresses in a given multiboot info
+ * 
+ * Given a pointer to a multiboot info, this will fix all references to
+ * addresses such that they are virtual addresses.
+ * 
+ * @param mb_info_ptr Pointer to the multiboot object.
+*/
+void multiboot_fix_addresses(multiboot_info_t** mb_info_ptr);
+
+#endif
+
+/** @} */

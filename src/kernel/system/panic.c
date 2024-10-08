@@ -1,15 +1,15 @@
 /// @file panic.c
 
-#include <kernel/system.h> // Implements
+#include <namuos/system.h> // Implements
 
-#include <stdlib.h> // abort
 
-extern void panic(const char* restrict format, ...) {
-	// TODO: Use klog_error method?
+void panic(const char* restrict format, ...) {
 	va_list vlist;
 	va_start(vlist, format);
-	kvprintf(format, vlist);
+	kvlog_critical(format, vlist);
 	va_end(vlist);
 
-	abort();
+	klog_critical("kernel: panic: abort()\n");
+	while(1) {}
+	__builtin_unreachable();
 }

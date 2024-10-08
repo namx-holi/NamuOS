@@ -1,14 +1,16 @@
 /**
  * @file bios_defines.h
- * @ingroup kernel_bios
+ * @defgroup arch_i386_bios_defines <arch_i386/bios_defines.h>
+ * @brief i386 BIOS addresses and constants
+ * @ingroup arch_i386
  * 
  * @todo Detailed description
  * 
  * @{
 */
 
-#ifndef _KERNEL_BIOS_DEFINES_H
-#define _KERNEL_BIOS_DEFINES_H 1
+#ifndef _ARCH_i386_BIOS_DEFINES_H
+#define _ARCH_i386_BIOS_DEFINES_H 1
 
 #include <stdint.h>
 
@@ -144,9 +146,9 @@
 #define BDA_CURSOR_POSITION_PAGE3 ((uint16_t*)0x0454) // 1 word
 #define BDA_CURSOR_POSITION_PAGE4 ((uint16_t*)0x0456) // 1 word
 #define BDA_CURSOR_POSITION_PAGE5 ((uint16_t*)0x0458) // 1 word
-#define BDA_CURsOR_POSITION_PAGE6 ((uint16_t*)0x045a) // 1 word
-#define BDA_CURsOR_POSITION_PAGE7 ((uint16_t*)0x045c) // 1 word
-#define BDA_CURsOR_POSITION_PAGE8 ((uint16_t*)0x045e) // 1 word
+#define BDA_CURSOR_POSITION_PAGE6 ((uint16_t*)0x045a) // 1 word
+#define BDA_CURSOR_POSITION_PAGE7 ((uint16_t*)0x045c) // 1 word
+#define BDA_CURSOR_POSITION_PAGE8 ((uint16_t*)0x045e) // 1 word
 
 #define BDA_CURSOR_ENDING_SCAN_LINE ((uint16_t*)0x0460) // 1 byte
 #define BDA_CURSOR_STARTING_SCAN_LINE ((uint16_t*)0x0461) // byte
@@ -167,9 +169,6 @@
 //  in the page table, not specifically looking for VGA.
 #define VIDEO_MEMORY_ADDR_MONOCHROME ((uint16_t*)0xb0000)
 #define VIDEO_MEMORY_ADDR_COLOUR ((uint16_t*)0xb8000)
-
-
-
 
 #endif
 

@@ -1,96 +1,88 @@
 /// @file klog.c
 
-#include <kernel/system.h> // Implements
+#include <namuos/system.h> // Implements
 
-#include <kernel/vga.h>
+#include <namuos/terminal.h>
 
 
-static const enum vga_colour DEBUG_BG = VGA_COLOUR_BLACK;
-static const enum vga_colour DEBUG_FG = VGA_COLOUR_LIGHT_BLUE;
 void klog_debug(const char* restrict format, ...) {
-	// Set colour scheme
-	uint8_t prev_colour = kprint_get_colour();
-	kprint_set_colour(DEBUG_BG<<4 | DEBUG_FG);
-
-	// Pull out VA and pass to kvprintf
+	// Pull out VA and pass to kvlog_debug
 	va_list vlist;
 	va_start(vlist, format);
+	kvlog_debug(format, vlist);
+	va_end(vlist);
+}
+
+void klog_info(const char* restrict format, ...) {
+	// Pull out VA and pass to kvlog_info
+	va_list vlist;
+	va_start(vlist, format);
+	kvlog_info(format, vlist);
+	va_end(vlist);
+}
+
+void klog_warning(const char* restrict format, ...) {
+	// Pull out VA and pass to kvlog_warning
+	va_list vlist;
+	va_start(vlist, format);
+	kvlog_warning(format, vlist);
+	va_end(vlist);
+}
+
+void klog_error(const char* restrict format, ...) {
+	// Pull out VA and pass to kvlog_error
+	va_list vlist;
+	va_start(vlist, format);
+	kvlog_error(format, vlist);
+	va_end(vlist);
+}
+
+void klog_critical(const char* restrict format, ...) {
+	// Pull out VA and pass to kvlog_critical
+
+	va_list vlist;
+	va_start(vlist, format);
+	kvlog_critical(format, vlist);
+	va_end(vlist);
+}
+
+void kvlog_debug(const char* restrict format, va_list vlist) {
+	// Set colour scheme, pass to kvprintf, and reset colour scheme
+	terminal_set_colour(_KLOG_DEBUG_BG, _KLOG_DEBUG_FG);
 	kprintf("DEBUG: ");
 	kvprintf(format, vlist);
-	va_end(vlist);
-
-	// Reset colour scheme
-	kprint_set_colour(prev_colour);
+	terminal_reset_colour();
 }
 
-static const enum vga_colour INFO_BG = VGA_COLOUR_BLACK;
-static const enum vga_colour INFO_FG = VGA_COLOUR_LIGHT_GREEN;
-void klog_info(const char* restrict format, ...) {
-	// Set colour scheme
-	uint8_t prev_colour = kprint_get_colour();
-	kprint_set_colour(INFO_BG<<4 | INFO_FG);
-
-	// Pull out VA and pass to kvprintf
-	va_list vlist;
-	va_start(vlist, format);
+void kvlog_info(const char* restrict format, va_list vlist) {
+	// Set colour scheme, pass to kvprintf, and reset colour scheme
+	terminal_set_colour(_KLOG_INFO_BG, _KLOG_INFO_FG);
 	kprintf("INFO: ");
 	kvprintf(format, vlist);
-	va_end(vlist);
-
-	// Reset colour scheme
-	kprint_set_colour(prev_colour);
+	terminal_reset_colour();
 }
 
-static const enum vga_colour WARNING_BG = VGA_COLOUR_BLACK;
-static const enum vga_colour WARNING_FG = VGA_COLOUR_LIGHT_BROWN;
-void klog_warning(const char* restrict format, ...) {
-	// Set colour scheme
-	uint8_t prev_colour = kprint_get_colour();
-	kprint_set_colour(WARNING_BG<<4 | WARNING_FG);
-
-	// Pull out VA and pass to kvprintf
-	va_list vlist;
-	va_start(vlist, format);
+void kvlog_warning(const char* restrict format, va_list vlist) {
+	// Set colour scheme, pass to kvprintf, and reset colour scheme
+	terminal_set_colour(_KLOG_WARNING_BG, _KLOG_WARNING_FG);
 	kprintf("WARNING: ");
 	kvprintf(format, vlist);
-	va_end(vlist);
-
-	// Reset colour scheme
-	kprint_set_colour(prev_colour);
+	terminal_reset_colour();
 }
 
-static const enum vga_colour ERROR_BG = VGA_COLOUR_BLACK;
-static const enum vga_colour ERROR_FG = VGA_COLOUR_RED;
-void klog_error(const char* restrict format, ...) {
-	// Set colour scheme
-	uint8_t prev_colour = kprint_get_colour();
-	kprint_set_colour(ERROR_BG<<4 | ERROR_FG);
-
-	// Pull out VA and pass to kvprintf
-	va_list vlist;
-	va_start(vlist, format);
+void kvlog_error(const char* restrict format, va_list vlist) {
+	// Set colour scheme, pass to kvprintf, and reset colour scheme
+	terminal_set_colour(_KLOG_ERROR_BG, _KLOG_ERROR_FG);
 	kprintf("ERROR: ");
 	kvprintf(format, vlist);
-	va_end(vlist);
-
-	// Reset colour scheme
-	kprint_set_colour(prev_colour);
+	terminal_reset_colour();
 }
 
-static const enum vga_colour CRITICAL_BG = VGA_COLOUR_RED;
-static const enum vga_colour CRITICAL_FG = VGA_COLOUR_BLACK;
-void klog_critical(const char* restrict format, ...) {
-	// Set colour scheme
-	uint8_t prev_colour = kprint_get_colour();
-	kprint_set_colour(CRITICAL_BG<<4 | CRITICAL_FG);
-
-	// Pull out VA and pass to kvprintf
-	va_list vlist;
-	va_start(vlist, format);
-	kprintf("CRITICAL: ");
+void kvlog_critical(const char* restrict format, va_list vlist) {
+	// Set colour scheme, pass to kvprintf, and reset colour scheme
+	terminal_set_colour(_KLOG_CRITICAL_BG, _KLOG_CRITICAL_FG);
+	// kprintf("CRITICAL: ");
 	kvprintf(format, vlist);
-	va_end(vlist);
-
-	// Reset colour scheme
-	kprint_set_colour(prev_colour);
+	terminal_reset_colour();
 }
+
