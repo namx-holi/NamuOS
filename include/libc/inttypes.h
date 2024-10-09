@@ -38,7 +38,7 @@
 /*****************************************************/
 
 /** @copydoc stdlib.h::abs */
-intmax_t imaxabs(intmax_t n);
+extern intmax_t imaxabs(intmax_t n);
 
 /** @brief Structure type, return of the @ref imaxdiv function */
 typedef struct {
@@ -47,7 +47,7 @@ typedef struct {
 } imaxdiv_t;
 
 /** @copydoc stdlib.h::div */
-imaxdiv_t imaxdiv(intmax_t x, intmax_t y);
+extern imaxdiv_t imaxdiv(intmax_t x, intmax_t y);
 
 
 
