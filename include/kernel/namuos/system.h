@@ -46,7 +46,7 @@ void kvlog_error(const char* restrict format, va_list vlist);
 void kvlog_critical(const char* restrict format, va_list vlist);
 
 // Panic!
-void panic(const char* restrict format, ...);
+void panic(const char* restrict format, ...) __attribute__((__noreturn__));
 
 #endif
 

@@ -105,7 +105,9 @@ void* memccpy(void* restrict dest, const void* restrict src, int c, size_t count
 	return NULL;
 }
 
+
 #ifdef __STDC_LIB_EXT1__ /* Bounds checking */
+#error "TODO: Implement in string/memx.c"
 errno_t memset_s(void* dest, rsize_t destsz, int ch, rsize_t count);
 errno_t memcpy_s(void* restrict dest, rsize_t destsz, const void* restrict src, rsize_t count);
 errno_t memmove_s(void* dest, rsize_t destsz, const void* src, rsize_t count);
