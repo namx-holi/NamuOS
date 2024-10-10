@@ -47,8 +47,6 @@ int region_rw_permission(uintptr_t paddr);
 
 
 void memory_paging_initialise(multiboot_info_t* mb_info) {
-	// TODO: Create the entire linear mapping here? Or just keep to 8 MiB?
-
 	(void)mb_info; // Multiboot info isn't needed for this architecture
 
 	// Allocate space for the kernel page directory, and set all entries to
@@ -58,65 +56,55 @@ void memory_paging_initialise(multiboot_info_t* mb_info) {
 	memset(pde, 0, sizeof(PDE_t) * PTRS_PER_PDE); // Clear all entries
 	for (uint32_t i = 0; i < PTRS_PER_PDE; ++i)
 		pde[i].rw = 1;
+	
+	// Allocate enough page tables for the entire linear mapping, and clear all
+	//  entries for each table.
+	// NOTE: This takes 4 MiB, make sure boot page tables are large enough!
+	uintptr_t page_tables_paddr;
+	PTE_t* page_tables = (PTE_t*)kvmalloc_p(
+		sizeof(PDE_t)
+		* PTRS_PER_PTE * PTRS_PER_PDE,
+		&page_tables_paddr);
+	memset(page_tables, 0, sizeof(PTE_t) * PTRS_PER_PTE * PTRS_PER_PDE);
+	klog_debug(
+		"paging - Allocated %d KiB for page tables\n",
+		sizeof(PDE_t) * PTRS_PER_PTE * PTRS_PER_PDE / 1024);
 
-	// Allocate space for 8 MiB worth of page tables to map the kernel image.
-	//  This should be enough to set up OS paging.
-	uintptr_t pg0_paddr;
-	uintptr_t pg1_paddr;
-	PTE_t* pg0 = (PTE_t*)kvmalloc_p(sizeof(PTE_t) * PTRS_PER_PTE, &pg0_paddr);
-	PTE_t* pg1 = (PTE_t*)kvmalloc_p(sizeof(PTE_t) * PTRS_PER_PTE, &pg1_paddr);
-	memset(pg0, 0, sizeof(PTE_t) * PTRS_PER_PTE); // Clear all entries
-	memset(pg1, 0, sizeof(PTE_t) * PTRS_PER_PTE); // Clear all entries
-
-	// Map pg0 and pg1 to the first 8 MiB of physical memory, 4 MiB per table.
-	// NOTE: BEcause pg1 is allocated immediately after pg0 using the boot
-	//  allocator, we can overflow into pg1 from pg0.
-	for (uint32_t i = 0; i < PTRS_PER_PTE * 2; ++i) {
-		pg0[i].present = 1; // This page points to a frame
-		pg0[i].global  = 1; // Accessible from anywhere, and shouldn't change
-		pg0[i].addr    = i; // The PFN, physical addres / PAGE_SIZE
-
-		// Check what region this page points to and set read-write accordingly
-		pg0[i].rw = region_rw_permission((uintptr_t)i << PAGE_SHIFT);
+	// Set up mapping for the kernel linear address space. Since the page tables
+	//  are allocated contiguously, we can overflow the index into each table.
+	for (uint32_t pfn = 0; pfn < (ZONE_HIGHMEM_OFFSET >> PAGE_SHIFT); ++pfn) {
+		page_tables[pfn].present = 1; // This page points to a frame
+		page_tables[pfn].global  = 1; // Accessible from anywhere, and shouldn't change
+		page_tables[pfn].addr    = pfn; // Physical address / PAGE_SIZE
+		
+		// Check what region this frame points to and set read-write accordingly
+		page_tables[pfn].rw = region_rw_permission((uintptr_t)pfn << PAGE_SHIFT);
 	}
+	klog_debug("paging - Page tables for kernel linear mapping set up\n");
 
-	// Make the first 8 MiB addressable from the start of kernel space, denoted
-	//  by PAGE_OFFSET. We also need an identity mapping that we remove later
-	//  just so everything doesn't immediately break when paging is enabled.
-	// Kernel-space mapping (vaddr = paddr + PAGE_OFFSET)
+	// Make this linear mapping addressable starting at PAGE_OFFSET.
 	uint32_t start_pfn = PAGE_OFFSET >> PGDIR_SHIFT;
-	pde[start_pfn].present   = 1;
-	pde[start_pfn].addr      = (uint32_t)pg0_paddr >> PAGE_SHIFT;
-	pde[start_pfn+1].present = 1;
-	pde[start_pfn+1].addr    = (uint32_t)pg1_paddr >> PAGE_SHIFT;
-	// Identity mapping (vaddr = paddr)
-	pde[0].present = 1;
-	pde[0].addr    = (uint32_t)pg0_paddr >> PAGE_SHIFT;
-	pde[1].present = 1;
-	pde[1].addr    = (uint32_t)pg1_paddr >> PAGE_SHIFT;
+	for (uint32_t i = 0; i < ZONE_HIGHMEM_OFFSET/PGDIR_SIZE; ++i) {
+		pde[start_pfn + i].present = 1;
+		pde[start_pfn + i].addr    = ((uint32_t)page_tables_paddr >> PAGE_SHIFT) + i;
+	}
+	klog_debug("paging - Page directory for kernel linear mapping set up\n");
 
-	// Set up the CR3 register to point to the physical address of our global
-	//  page directory. We don't need any CR3 flags (bit 3,4 for PWT,PCD).
+	// Set up the CR3 register to point to the physical address of the page
+	//  directory. We don't need any CR3 flags for this (bit 3,4 for PWT, PCD).
 	uint32_t cr3 = (uint32_t)pde_paddr;
 	asm volatile ("mov %0, %%cr3" : : "a"(cr3) : "memory");
 
 	// Enable paging (bit 31) and write protect (bit 16) with CR0 register
-	uint32_t cr0;
-	asm volatile (
-		"mov %%cr0, %0; or $0x80010000, %0; mov %0, %%cr0;" : "=r"(cr0) : : "memory");
-	
-	// Paging is now set up! Get rid of the identity mapping and invalidate
-	//  those addresses.
-	pde[0].present = 0;
-	pde[0].addr    = 0;
-	pde[1].present = 0;
-	pde[1].addr    = 0;
-	invalidate_page(0 << PAGE_SHIFT);
-	invalidate_page(1 << PAGE_SHIFT);
+	// TODO: Do we need to still do this if paging already enabled?
+	// uint32_t cr0;
+	// asm volatile (
+	// 	"mov %%cr0, %0; or $0x80010000, %0; mov %0, %%cr0;" : "=r"(cr0) : : "memory");
 
 	// Now that paging is set up, we can set our global page directory! We're
 	//  free of the boot page directory!
 	pgd = pde;
+	klog_debug("paging - Paging enabled for linear mapping\n");
 }
 
 void memory_memmap_initialise(multiboot_info_t* mb_info) {
