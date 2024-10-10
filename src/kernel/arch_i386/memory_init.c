@@ -118,43 +118,65 @@ void memory_memmap_initialise(multiboot_info_t* mb_info) {
 
 	// Find the total number of frames on the system
 	uint32_t nb_frames = get_nb_frames(mb_info->mmap_addr, mmap_length);
-	klog_debug("Total number of frames on system: %d (%d MiB)\n", nb_frames, nb_frames/256);
+	klog_debug(
+		"memmap - Total number of frames on system: %d (%d MiB)\n",
+		nb_frames, nb_frames * (PAGE_SIZE / 1024) / 1024);
 
-	// Allocate space for the frame usage bitmap. Each byte can represent 8
-	//  frames, so we need (nb_frames/8) bytes to represent every frame
+	// Allocate space for the usage bitmap, and memmap itself. We'll set all
+	//  frames as currently free and cleared so we can set them up from clean.
+	// bitmap
 	uintptr_t bitmap_paddr;
-	memmap_bitmap = (uint32_t*)kvmalloc_p(nb_frames/8, &bitmap_paddr);
-	memset(memmap_bitmap, UINT32_MAX, nb_frames/8); // Mark every frame as free
+	uint32_t bitmap_size = nb_frames / 8; // 8 bits per byte
+	uint32_t* new_bitmap = (uint32_t*)kvmalloc_p(bitmap_size, &bitmap_paddr);
+	memset(new_bitmap, UINT32_MAX, bitmap_size);
+	klog_debug("memmap - Allocated %d KiB for memmap bitmap\n", bitmap_size/1024);
+	// memmap
+	uintptr_t memmap_paddr;
+	uint32_t memmap_size = nb_frames * sizeof(frame_t);
+	frame_t* new_memmap = (frame_t*)kvmalloc_p(memmap_size, &memmap_paddr);
+	memset(new_memmap, 0, memmap_size);
+	klog_debug("memmap - Allocated %d KiB for memmap\n", memmap_size/1024);
 
-	// As memmap_bitmap has been allocated in kernel-space, the end of this
-	//  array is the end of any allocations so far (just allocates linearly).
-	//  We can mark all frames up to the physical address of the end of
-	//  memmap_bitmap as used. This includes any BIOS stuff that appears before
-	//  the kernel image.
-	uintptr_t bitmap_end_paddr = bitmap_paddr + nb_frames/8;
-	klog_debug("End physical address of memmap_bitmap is 0x%p\n", bitmap_end_paddr-1);
-	for (uint32_t pfn = 0; pfn < bitmap_end_paddr/PAGE_SIZE; ++pfn)
+	// We can now set the global bitmap and memmap, as we don't need any more
+	//  allocations until they're set up
+	memmap_bitmap = new_bitmap;
+	memmap = new_memmap;
+
+	// Everything allocated by the kernel so far must be reserved so that it
+	//  isn't swapped out. We'll also mark those frames as used in the bitmap.
+	uintptr_t memmap_end_paddr = (uintptr_t)memmap_paddr + memmap_size;
+	for (uint32_t pfn = 0; pfn < (memmap_end_paddr >> PAGE_SHIFT); ++pfn) {
 		memmap_bitmap_flag_used(pfn);
-	
-	// Step through the memory map from GRUB to flag reserved regions as used
+		memmap[pfn].reserved = 1;
+	}
+	klog_debug("memmap - Address range 0x0 to 0x%p reserved for kernel\n", memmap_end_paddr-1);
+
+	// Step through the memory map from GRUB to flag reserved regions as such
 	for (uint32_t i = 0; i < mmap_length; ++i) {
 		multiboot_memory_map_t entry = mb_info->mmap_addr[i];
 
-		// Only if a region is marked explicitly as *AVAILABLE* can we use it.
-		// NOTE: We could refine this by using ACPI reclaimable or non-volatile,
-		//  but that's hard...
+		// We'll only use regions explicitly marked as *AVAILABLE*. We *could*
+		//  use ACPI reclaimable or non-volatile, but that's hard...
 		if (entry.type == MULTIBOOT_MEMORY_AVAILABLE) continue;
 
-		// Get the page frame numbers of the start and end addresses of this
-		//  range, and mark all frames as used
-		uint32_t start_pfn = entry.base_addr / PAGE_SIZE;
-		uint32_t end_pfn = (entry.base_addr + entry.length) / PAGE_SIZE;
-		for (uint32_t pfn = start_pfn; pfn < end_pfn; ++pfn)
+		// Get the page frame numbers of the start and end of this entry, and
+		//  mark as used, and to skip.
+		uint32_t pfn_start = entry.base_addr >> PAGE_SHIFT;
+		uint32_t pfn_end = (entry.base_addr + entry.length) >> PAGE_SHIFT;
+		for (uint32_t pfn = pfn_start; pfn < pfn_end; ++pfn) {
 			memmap_bitmap_flag_used(pfn);
+			memmap[pfn].skip = 1;
+			memmap[pfn].reserved = 1;
+		}
+		klog_debug(
+			"memmap - Address range 0x%p to 0x%p skipped\n",
+			pfn_start<<PAGE_SHIFT, (pfn_end<<PAGE_SHIFT) - 1);
 	}
 
-	// TODO: Continue this
-	klog_warning("TODO: Finish memory_memmap_initialise\n");
+	// Finally, mark frames in ZONE_HIGHMEM as such
+	for (uint32_t pfn = (ZONE_HIGHMEM_OFFSET >> PAGE_SHIFT); pfn < nb_frames; ++pfn) {
+		memmap[pfn].highmem = 1;
+	}
 }
 
 
