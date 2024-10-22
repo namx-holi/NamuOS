@@ -13,6 +13,7 @@
 #define _NAMUOS_SYSTEM_H 1
 
 #include <stdarg.h>
+#include <stdint.h>
 
 // TODO: Doxygen comments
 
@@ -46,7 +47,10 @@ void kvlog_error(const char* restrict format, va_list vlist);
 void kvlog_critical(const char* restrict format, va_list vlist);
 
 // Panic!
+// TODO: Rename panic_new, make the new standard instead of old panic
+#define panic_new(format, ...) _panic_new(__FILE__, __LINE__, format, __VA_ARGS__)
 void panic(const char* restrict format, ...) __attribute__((__noreturn__));
+void _panic_new(const char* file, uint32_t line, const char* restrict format, ...) __attribute__((__noreturn__));
 
 #endif
 
