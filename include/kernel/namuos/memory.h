@@ -125,51 +125,23 @@ struct page_frame {
 typedef struct page_frame frame_t;
 
 
-/// Bitmap of free frames. A bit of 1 indicates a free frame.
-extern uint32_t* memmap_bitmap;
-
 /// Pointer to the beginning of memmap, an array of `frame_t` for each frame.
 extern frame_t* memmap;
 
 
 /** @brief Initialises memory for the operating system
  * 
- * Initialises memory for the operating system by calling all other setup
- * methods.
+ * Initialises memory for the operating system for the given architecture. This
+ * should include paging and any other setup.
  * 
  * @param mb_info Multiboot info passed from GRUB
 */
-void memory_initialise(multiboot_info_t* mb_info);
-
-/** @brief Sets up operating-system paging for given architecture
- * 
- * Sets up any architecture-specific structures and calls any required
- * instructions to set up kernel-space linear mapping.
- * 
- * @param mb_info Multiboot info passed from GRUB
-*/
-ARCH_METHOD void memory_paging_initialise(multiboot_info_t* mb_info);
-
-/** @brief Sets up frame memory map for given architecture
- * 
- * @todo Description
- * 
- * @param mb_info Multiboot info passed from GRUB
-*/
-ARCH_METHOD void memory_memmap_initialise(multiboot_info_t* mb_info);
-// NOTE: Memory map is initialised per-architecture as it initialises frames
-//  based on regions in the linker script for the architecture.
-
-
-// TODO: Doxygen comments
-void memmap_bitmap_flag_used(uint32_t pfn);
-void memmap_bitmap_flag_free(uint32_t pfn);
-uint32_t memmap_bitmap_test(uint32_t pfn);
-
+ARCH_METHOD void memory_initialise(multiboot_info_t* mb_info);
 
 
 
 // Kernel-level memory allocators
+// TODO: Do we still want these?
 
 /** @brief Allocate kernel memory
  * 

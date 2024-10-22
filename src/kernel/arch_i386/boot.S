@@ -29,16 +29,19 @@ stack_bottom:
 stack_top:
 
 
-# Reserve space for boot page directory, and two page tables for 8 MiB
+# Reserve space for the kernel page directory, and two page tables to cover the
+#  kernel image (8 MiB)
 .section .bss, "aw", @nobits
+.global _kernel_pgd
+.global _kernel_pg0
+.global _kernel_pg1
 .align 4096
-boot_pgd:
+_kernel_pgd:
 .skip 4096
-boot_pg0:
+_kernel_pg0:
 .skip 4096
-boot_pg1:
+_kernel_pg1:
 .skip 4096
-# NOTE: May need more page tables if kernel gets too big.
 
 
 # Kernel entry point
@@ -47,7 +50,7 @@ boot_pg1:
 .type _start, @function
 _start:
 	# Set %edi to the physical address of first page table entry
-	movl $(boot_pg0 - PAGE_OFFSET), %edi
+	movl $(_kernel_pg0 - PAGE_OFFSET), %edi
 	# %edi - address of page table entry
 
 	# We'll map two page tables worth of entries in pg0 and pg1. Since tables
@@ -67,19 +70,22 @@ page_table_loop:
 	addl $4, %edi    # Move to address of next page table entry (each 32 bits)
 	loop page_table_loop # Step down %ecx by one and repeat if non-zero
 page_table_loop_end:
+
 	# Create an identity mapping and a mapping for kernel-space in PGD that is
 	#  present and writable for both pages
-	movl $(boot_pg0 - PAGE_OFFSET + 0x003), boot_pgd - PAGE_OFFSET + 0 # Identity
-	movl $(boot_pg1 - PAGE_OFFSET + 0x003), boot_pgd - PAGE_OFFSET + 4 # Identity
-	movl $(boot_pg0 - PAGE_OFFSET + 0x003), boot_pgd - PAGE_OFFSET + PGD_OFFSET*4 # Kernel
-	movl $(boot_pg1 - PAGE_OFFSET + 0x003), boot_pgd - PAGE_OFFSET + PGD_OFFSET*4 + 4 # Kernel
+	# Identity
+	movl $(_kernel_pg0 - PAGE_OFFSET + 0x003), _kernel_pgd - PAGE_OFFSET + 0
+	movl $(_kernel_pg1 - PAGE_OFFSET + 0x003), _kernel_pgd - PAGE_OFFSET + 4
+	# Kernel-space
+	movl $(_kernel_pg0 - PAGE_OFFSET + 0x003), _kernel_pgd - PAGE_OFFSET + PGD_OFFSET*4
+	movl $(_kernel_pg1 - PAGE_OFFSET + 0x003), _kernel_pgd - PAGE_OFFSET + PGD_OFFSET*4 + 4
 	# NOTE: *4 for PGD_OFFSET so we get byte offset (each entry 32 bits)
 	# NOTE: Similar to PTEs, setting entry to the address sets the 20 most sig
 	#  bits to (address >> PAGE_SHIFT)
 
-	# Set CR3 register to the address of boot_pgd. We don't need to set any
+	# Set CR3 register to the address of _kernel_pgd. We don't need to set any
 	#  PWT or PCD flags (bit 3 and 4 respectively).
-	movl $(boot_pgd - PAGE_OFFSET), %ecx
+	movl $(_kernel_pgd - PAGE_OFFSET), %ecx
 	movl %ecx, %cr3
 
 	# Finally, enable paging (bit 31) with write-protect (bit 16) in CR0
@@ -97,8 +103,8 @@ page_table_loop_end:
 # NOTE: Paging is now fully enabled. No need for PAGE_OFFSET on addresses!
 boot_kernel:
 	# Remove the identity mapping, and force a TLB flush by reloading CR3
-	movl $0, boot_pgd + 0
-	movl $0, boot_pgd + 4
+	movl $0, _kernel_pgd + 0
+	movl $0, _kernel_pgd + 4
 	movl %cr3, %ecx
 	movl %ecx, %cr3
 

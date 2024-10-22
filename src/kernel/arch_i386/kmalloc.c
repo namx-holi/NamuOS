@@ -53,11 +53,11 @@ void* kmalloc_real(size_t size, int align, uintptr_t* paddr_ptr) {
 	uintptr_t paddr = placement_pointer;
 	void* vaddr = __to_virt(placement_pointer);
 
-	// If operating system paging is set up, need to handle extending the paged
-	//  region if needed
-	if (pgd) {
-		// TODO: Handle extending region
-	}
+	// // If operating system paging is set up, need to handle extending the paged
+	// //  region if needed
+	// if (pgd) {
+	// 	// TODO: Handle extending region
+	// }
 
 	// If the memory map has been initialised, update frames as used
 	// TODO: Handle marking frames as used
