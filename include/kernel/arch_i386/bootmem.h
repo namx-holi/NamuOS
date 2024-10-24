@@ -104,6 +104,20 @@ void* bootmem_alloc_low(size_t size);
 */
 void* bootmem_aligned_alloc(size_t size);
 
+/** @brief Allocates `size` bytes from ZONE_DMA. Allocation will be page aligned.
+ * 
+ * Allocates `size` bytes from ZONE_DMA. Allocation will be page aligned.
+ * 
+ * @note This should be used sparingly. One situation is in setting up paging,
+ * where only the first 8 MiB are pre-mapped by boot, and ZONE_NORMAL starts at
+ * 16 MiB.
+ * 
+ * @param size Number of bytes to allocate
+ * 
+ * @returns Pointer to allocated block
+*/
+void* bootmem_aligned_alloc_low(size_t size);
+
 // Boot allocator end of life
 // TODO: Doxygen comment
 void bootmem_free_all();

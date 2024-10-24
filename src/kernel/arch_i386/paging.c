@@ -57,7 +57,8 @@ void paging_initialise(multiboot_info_t* mb_info) {
 	// Allocate space for the remaining page tables, and clear all entries. All
 	//  page tables are allocated contiguously in one block, and we can overflow
 	//  to fill entries for the linear mapping.
-	PTE_t* entries = (PTE_t*)bootmem_aligned_alloc(sizeof(PTE_t) * PTRS_PER_PTE * new_tables);
+	// NOTE: Allocation needs to be in ZONE_DMA as not mapped otherwise.
+	PTE_t* entries = (PTE_t*)bootmem_aligned_alloc_low(sizeof(PTE_t) * PTRS_PER_PTE * new_tables);
 	memset(entries, 0, sizeof(PTE_t) * PTRS_PER_PTE * new_tables);
 
 	// Set `global` and `present` for entries we need, and set as writable as we
@@ -80,7 +81,9 @@ void paging_initialise(multiboot_info_t* mb_info) {
 
 	// Update the current paging directory for CPU, and we've got paging set up!
 	paging_update_current_pgd();
-	klog_debug("Kernel linear mapping set up\n");
+	klog_debug(
+		"Initialised linear mapping 0x%p to 0x%p\n",
+		__to_virt(0), __to_virt(ZONE_HIGHMEM_OFFSET));
 }
 
 void invalidate_page(uintptr_t vaddr) {
