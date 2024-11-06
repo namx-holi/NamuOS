@@ -9,8 +9,8 @@
  * @{
 */
 
-#ifndef _NAMUOS_MULTIBOOT_H
-#define _NAMUOS_MULTIBOOT_H 1
+#ifndef _MULTIBOOT_H
+#define _MULTIBOOT_H 1
 
 #include <stdint.h>
 

@@ -9,8 +9,8 @@
  * @{
 */
 
-#ifndef _ARCH_i386_BIOS_DEFINES_H
-#define _ARCH_i386_BIOS_DEFINES_H 1
+#ifndef _BIOS_DEFINES_H
+#define _BIOS_DEFINES_H 1
 
 #include <stdint.h>
 

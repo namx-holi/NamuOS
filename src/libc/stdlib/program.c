@@ -3,7 +3,7 @@
 #include <stdlib.h> // Implements
 
 #if defined(__is_libk)
-#include <namuos/system.h> // panic
+#include <namuos/panic.h> // panic
 #endif
 
 
@@ -11,7 +11,7 @@
 __attribute__((__noreturn__)) void abort(void) {
 	#if defined(__is_libk)
 	// If compiled with kernel, panic
-	panic("abort() called.\n");
+	panic("abort() called.\n", 2);
 	__builtin_unreachable();
 	#else
 	#error "abort() is not implemented outside of kernel"

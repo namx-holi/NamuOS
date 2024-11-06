@@ -1,7 +1,3 @@
-# TODO: Pull arch from parent makefile
-ARCH=arch_i386
-
-
 ASM=i686-elf-gcc
 ASM_FLAGS=-O2 -g -ffreestanding -Wall -Wextra
 
@@ -20,19 +16,19 @@ KERNEL=$(BUILD_ROOT)/namuos.kernel
 
 # Boot related stuff
 KERNEL_BOOT_START_OBJ=\
-	$(BUILD_DIR)/$(ARCH)/crti.o \
-	$(BUILD_DIR)/$(ARCH)/crtbegin.o \
-	$(BUILD_DIR)/$(ARCH)/boot.o
+	$(BUILD_DIR)/bootstrap/crti.o \
+	$(BUILD_DIR)/bootstrap/crtbegin.o \
+	$(BUILD_DIR)/bootstrap/boot.o
 KERNEL_BOOT_END_OBJ=\
-	$(BUILD_DIR)/$(ARCH)/crtend.o \
-	$(BUILD_DIR)/$(ARCH)/crtn.o
+	$(BUILD_DIR)/bootstrap/crtend.o \
+	$(BUILD_DIR)/bootstrap/crtn.o
 
 # Kernel source
 KERNEL_C_SRC=$(wildcard *.c) $(wildcard **/*.c)
 KERNEL_C_OBJ=$(patsubst %.c, $(BUILD_DIR)/%.o, $(KERNEL_C_SRC))
 KERNEL_SRC_DIRS=$(wildcard **/)
 KERNEL_OBJ_DIRS=$(patsubst %, $(BUILD_DIR)/%, $(KERNEL_SRC_DIRS))
-LINKER=$(ARCH)/linker.ld
+LINKER=linker.ld
 
 
 .phony: build clean
@@ -46,7 +42,7 @@ $(KERNEL): $(KERNEL_BOOT_START_OBJ) $(KERNEL_BOOT_END_OBJ) $(KERNEL_C_OBJ)
 	mkdir -p $(SYSROOT)/boot
 	cp $(KERNEL) $(SYSROOT)/boot
 
-$(BUILD_DIR)/$(ARCH)/crtbegin.o $(BUILD_DIR)/$(ARCH)/crtend.o: # Special
+$(BUILD_DIR)/bootstrap/crtbegin.o $(BUILD_DIR)/bootstrap/crtend.o: # Special
 	OBJ=`$(ASM) $(ASM_FLAGS) --sysroot=$(SYSROOT) -isystem=/usr/include -print-file-name=$(@F)` && cp "$$OBJ" $@
 
 

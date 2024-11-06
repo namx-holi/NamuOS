@@ -3,7 +3,7 @@
 #include <stdio.h> // Implements
 
 #if defined(__is_libk)
-#include <namuos/system.h> // kvprintf
+#include <namuos/terminal.h> // kvprintf
 #endif
 
 

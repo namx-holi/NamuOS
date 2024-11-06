@@ -50,6 +50,7 @@ qemu:
 
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -rf $(ISO_OBJ)
 
 docs:
 	doxygen Doxyfile

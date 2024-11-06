@@ -2,14 +2,17 @@
 
 #include <namuos/multiboot.h> // Implements
 
-#include <namuos/memory.h>
+#include <namuos/paging.h>
 
-/// Helper that fixes a given address
-void fix_addr(void** addr) {
+
+/// Helper that fixes a given address. Will adjust physical addresses to virtual
+///  addresses.
+void _fix_addr(void** addr) {
 	if (*addr != 0 && *addr < (void*)PAGE_OFFSET)
 		*addr = __to_virt(*addr);
 }
-#define FIX_ADDR(addr) fix_addr((void**)(addr))
+#define FIX_ADDR(addr) _fix_addr((void**)(addr))
+
 
 void multiboot_fix_addresses(multiboot_info_t** mb_info_ptr) {
 	// First, fix the address of mb_info itself if it's physical
@@ -24,6 +27,6 @@ void multiboot_fix_addresses(multiboot_info_t** mb_info_ptr) {
 	FIX_ADDR(&mb_info->boot_loader_name);
 	FIX_ADDR(&mb_info->amp_table);
 
-	if (mb_info->framebuffer_type & MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED)
+	if (mb_info->framebuffer_addr & MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED)
 		FIX_ADDR(&mb_info->colour_info.framebuffer_palette_addr);
 }

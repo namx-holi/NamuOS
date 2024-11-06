@@ -1,37 +1,43 @@
-/**
- * @file paging.h
- * @defgroup arch_i386_paging <arch_i386/paging.h>
- * @brief i386 methods and structs for working with paging
- * @ingroup arch_i386
- * 
- * @todo Detailed description
- * 
- * @{
-*/
+/// @file paging.h
+// TODO: Doxygen comments
 
-#ifndef _ARCH_i386_PAGING_H
-#define _ARCH_i386_PAGING_H 1
+#ifndef _PAGING_H
+#define _PAGING_H 1
 
+#include <stddef.h>
 #include <stdint.h>
-#include <namuos/multiboot.h>
 
 
+/// Virtual address for the beginning of kernel space
+#define PAGE_OFFSET 0xC0000000
+
+// Macros to translate to-from virtual/physical address in kernel space
+#define __to_virt(x) (void*)((uintptr_t)(x) + PAGE_OFFSET)
+#define __to_phys(x) (uintptr_t)((uintptr_t)(x) - PAGE_OFFSET)
+
+// Locations of special regions in physical address space
+#define ZONE_DMA_OFFSET     0x00000000
+#define ZONE_DMA_SIZE       0x01000000 // First 16 MiB
+#define ZONE_NORMAL_OFFSET  0x01000000
+#define ZONE_NORMAL_SIZE    0x37000000 // 16 MiB to 896 MiB
+#define ZONE_HIGHMEM_OFFSET 0x38000000
+#define ZONE_HIGHMEM_SIZE   0xc8000000 // 896 MiB to end
+
+// PTE bits
 #define PAGE_SHIFT 12
 #define PAGE_SIZE  (1UL << PAGE_SHIFT)
 #define PAGE_MASK  (~(PAGE_SIZE-1))
 #define PAGE_ALIGN(addr) (((addr) + PAGE_SIZE - 1) & PAGE_MASK)
 #define PTRS_PER_PTE 1024
 
+// PDE bits
 #define PGDIR_SHIFT 22
 #define PGDIR_SIZE  (1UL << PGDIR_SHIFT)
 #define PGDIR_MASK  (~(PGDIR_SIZE-1))
 #define PTRS_PER_PDE 1024
 
 
-/** @brief i386 Page Table Entry
- * 
- * Structure used for page table entries.
-*/
+/// Structure used for page table entries (PTEs)
 union page_PTE {
 	uint32_t raw;
 	struct {
@@ -84,10 +90,7 @@ union page_PTE {
 } __attribute__((packed));
 typedef union page_PTE PTE_t;
 
-/** @brief i386 Page Directory Entry
- * 
- * Structure used for page directory entries.
-*/
+/// Structure used for page directory entries (PDEs)
 union page_PDE {
 	uint32_t raw;
 	struct {
@@ -130,38 +133,24 @@ union page_PDE {
 
 		// Bits 12 - 31, Physical address of referenced page table
 		uint32_t addr:20;
-		};
+	};
 } __attribute__((packed));
 typedef union page_PDE PDE_t;
 
-// TODO: i386 4 MiB PDE if PSE bit enabled
+// TODO: 4 MiB PDE if PSE bit enabled
 
 
-/// Kernel page directory
-extern PDE_t* kernel_pgd;
-
-/// Current page directory
-extern PDE_t* current_pgd;
-
+// Pointers to current page directory, and kernel page directory
+extern PDE_t* kernel_pgd;  ///< Kernel page directory
+extern PDE_t* current_pgd; ///< Current page directory
 
 // TODO: Doxygen comment
-void paging_initialise(multiboot_info_t* mb_info);
+void paging_initialise();
 
-/** @brief Invalidates physical address for TLB
- * 
- * Invalidates a physical address for the TLB. Should be called any time paging
- * changes for a frame.
- * 
- * @param paddr Address of the start of the virtual address to invalidate.
-*/
-void invalidate_page(uintptr_t vaddr);
+// TODO: Doxygen comment
+void invalidate_page(void* vaddr);
 
-/** @brief Updates CR3 register to point to current page directory
- * 
- * @todo Detailed description
-*/
-void paging_update_current_pgd();
+// TODO: Doxygen comment
+void paging_change_pgd(PDE_t* pgd);
 
 #endif
-
-/** @} */

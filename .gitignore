@@ -7,6 +7,9 @@ build
 
 # Old code
 old
+older
+oldest
+include/kernel/kernel/memory_ideal
 
 # Generated documentation
 doxygen

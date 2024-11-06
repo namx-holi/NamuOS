@@ -1,6 +1,6 @@
 /// @file inttypes.c
 
-#include <inttypes.h> // Include
+#include <inttypes.h> // Implements
 
 
 // TODO: Implement imaxabs

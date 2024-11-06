@@ -1,35 +1,22 @@
-/**
- * @file bootmem.h
- * @defgroup arch_i386_bios_defines <arch_i386/bootmem.h>
- * @brief i386 boot memory allocator
- * @ingroup arch_i386
- * 
- * @todo Detailed description
- * 
- * @{
-*/
+/// @file boot_allocator.h
+// TODO: Doxygen comments
 
-#ifndef _ARCH_i386_BOOT_MEM_H
-#define _ARCH_i386_BOOT_MEM_H 1
+#ifndef _BOOT_ALLOCATOR_H
+#define _BOOT_ALLOCATOR_H 1
 
 #include <stddef.h>
 #include <stdint.h>
-
 #include <namuos/multiboot.h>
+#include <namuos/terminal.h>
 
-
-// Contains info needed for the boot memory allocator
-// TODO: Doxygen comment
+/// Information needed for the boot memory allocator
 typedef struct {
-	uint32_t pfn_start;   ///< First physical page frame available to allocator
-	uint32_t pfn_end;     ///< Last physical page frame available to allocator
+	uint32_t pfn_start;   ///< First PFN available to allocator
+	uint32_t pfn_end;     ///< Last PFN available to allocator
 	char* bitmap;         ///< Bitmap representing free/allocated pages
-	uint32_t last_pfn;    ///< Last page used in an allocation
-	uint32_t last_offset; ///< Offset in a page of the last allocation
+	uint32_t last_pfn;    ///< Last page allocated
+	uint32_t last_offset; ///< Offset within the last page allocated
 } bootmem_data_t;
-
-/// Global boot memory allocation data
-extern bootmem_data_t bootmem_data;
 
 
 /** @brief Initialises boot allocator 
@@ -118,10 +105,6 @@ void* bootmem_aligned_alloc(size_t size);
 */
 void* bootmem_aligned_alloc_low(size_t size);
 
-// Boot allocator end of life
-// TODO: Doxygen comment
-void bootmem_free_all();
+// TODO: bootmem_free_all();
 
 #endif
-
-/** @} */
